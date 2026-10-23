@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8/D Sınıf Portalı</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Arka Plan Neon Efekti -->
+    <div class="bg-glow"></div>
+
+    <!-- 0. SİBERPUNK İNTRO VE GÖSTERMELİK TARAMA EKRANI -->
+    <div id="welcome-intro-screen" class="intro-screen active">
+        <div class="cyber-overlay"></div>
+        <div class="cyber-grid"></div>
+        
+        <div class="intro-content">
+            <div class="cyber-badge">SYSTEM INITIALIZING...</div>
+            <h1 class="glow-title glitch-text" data-text="8/D CLASS">8/D CLASS</h1>
+            <h2 class="glow-subtitle">SECURITY SYSTEM</h2>
+
+            <div class="hud-lines">
+                <span class="hud-line left"></span>
+                <span class="hud-dot"></span>
+                <span class="hud-line right"></span>
+            </div>
+
+            <div class="cyber-loader-container">
+                <div id="cyber-loader-bar" class="cyber-loader-bar"></div>
+            </div>
+
+            <!-- GÖSTERMELİK TARAMA MADDELERİ -->
+            <div class="scan-items-container">
+                <div id="scan-item-1" class="scan-item"><span>[ ⏳ ]</span> VİRÜS KONTROLÜ</div>
+                <div id="scan-item-2" class="scan-item"><span>[ ⏳ ]</span> RAT & TROJAN KONTROLÜ</div>
+                <div id="scan-item-3" class="scan-item"><span>[ ⏳ ]</span> KÖTÜ AMAÇLI YAZILIM KONTROLÜ</div>
+                <div id="scan-item-4" class="scan-item"><span>[ ⏳ ]</span> SİSTEM GÜVENLİK PROTOKOLÜ</div>
+            </div>
+
+            <div id="scan-status-text" class="cyber-status-text">GÜVENLİK TARAMASI BAŞLATILIYOR... %0</div>
+        </div>
+    </div>
+
+    <!-- 1. ULTRA HAVALI SİBERPUNK PIN EKRANI -->
+    <div id="pin-screen">
+        <div class="cyber-hex-grid"></div>
+        <div class="cyber-scanline"></div>
+
+        <div class="welcome-box cyber-vault-card">
+            <div class="vault-header">
+                <span class="vault-badge-live">● LIVE TERMINAL</span>
+                <span class="vault-badge-id">PORTAL-8D // v4.0</span>
+            </div>
+
+            <h1 class="welcome-text cyber-glitch" data-text="8/D PORTAL">8/D PORTAL</h1>
+            <p class="subtitle cyber-sub">GÜVENLİK PROTOKOLÜ: ROL SEÇİN & PIN GİRİN</p>
+
+            <div class="role-selector cyber-roles">
+                <button type="button" class="role-btn active" onclick="selectRole('student')">
+                    <span class="role-icon">👤</span> ÖĞRENCİ
+                </button>
+                <button type="button" class="role-btn" onclick="selectRole('teacher')">
+                    <span class="role-icon">👑</span> YÖNETİCİ
+                </button>
+            </div>
+
+            <div class="pin-container">
+                <div class="pin-display cyber-display">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+
+                <div class="keypad cyber-keypad">
+                    <button type="button" onclick="pressKey('1')">1</button>
+                    <button type="button" onclick="pressKey('2')">2</button>
+                    <button type="button" onclick="pressKey('3')">3</button>
+                    <button type="button" onclick="pressKey('4')">4</button>
+                    <button type="button" onclick="pressKey('5')">5</button>
+                    <button type="button" onclick="pressKey('6')">6</button>
+                    <button type="button" onclick="pressKey('7')">7</button>
+                    <button type="button" onclick="pressKey('8')">8</button>
+                    <button type="button" onclick="pressKey('9')">9</button>
+                    <button type="button" class="action-btn clear-btn" onclick="clearPin()">CLR</button>
+                    <button type="button" onclick="pressKey('0')">0</button>
+                    <button type="button" class="action-btn submit cyber-go" onclick="checkPin()">ENTER ⚡</button>
+                </div>
+            </div>
+
+            <p id="error-message" class="error-text cyber-error"></p>
+        </div>
+    </div>
+
+    <!-- 1.5 KULLANICI ADI & ŞİFRE (GİRİŞ / KAYIT) EKRANI -->
+    <div id="auth-screen" class="portal-screen">
+        <div class="welcome-box" style="max-width: 450px;">
+            <h2 class="welcome-text" style="font-size: 2rem;">👤 HESAP ERİŞİMİ</h2>
+            <p class="subtitle">Devam etmek için giriş yapın veya kayıt olun</p>
+
+            <div class="role-selector" style="margin-bottom: 1rem;">
+                <button type="button" id="tab-login-btn" class="role-btn active" onclick="switchAuthTab('login')">Giriş Yap</button>
+                <button type="button" id="tab-register-btn" class="role-btn" onclick="switchAuthTab('register')">Kayıt Ol</button>
+            </div>
+
+            <div id="form-login">
+                <input type="text" id="login-username" placeholder="Kullanıcı Adı" class="auth-input">
+                <input type="password" id="login-password" placeholder="Şifre" class="auth-input">
+                
+                <div class="remember-container">
+                    <label class="remember-label">
+                        <input type="checkbox" id="remember-me-check">
+                        <span class="custom-checkbox"></span>
+                        Beni Hatırla
+                    </label>
+                </div>
+
+                <button type="button" onclick="handleLogin()" class="auth-submit-btn">Giriş Yap 🚀</button>
+            </div>
+
+            <div id="form-register" style="display: none;">
+                <input type="text" id="reg-username" placeholder="Kullanıcı Adı Seçin" class="auth-input">
+                <input type="password" id="reg-password" placeholder="Şifre Belirleyin" class="auth-input">
+                <input type="password" id="reg-password-confirm" placeholder="Şifreyi Tekrar Girin" class="auth-input">
+                <button type="button" onclick="handleRegister()" class="auth-submit-btn" style="background: linear-gradient(135deg, #22c55e, #16a34a);">Hesap Oluştur ✨</button>
+            </div>
+
+            <p id="auth-error-msg" class="error-text"></p>
+            <button type="button" onclick="backToPinScreen()" style="margin-top: 10px; background: transparent; border: none; color: #a78bfa; cursor: pointer; font-size: 0.85rem;">← PIN Ekranına Dön</button>
+        </div>
+    </div>
+
+    <!-- PROFİL DÜZENLEME MODAL -->
+    <div id="profile-modal" class="modal-overlay">
+        <div class="welcome-box modal-box" style="max-width: 420px;">
+            <h2 class="welcome-text" style="font-size: 1.8rem;">✏️ PROFİL DÜZENLE</h2>
+            <p class="subtitle">Profil resmini, adını ve ilgi alanlarını güncelle</p>
+
+            <div class="profile-preview-container">
+                <img id="modal-avatar-preview" src="https://via.placeholder.com/100?text=Profil" alt="Profil Fotoğrafı">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label for="avatar-input" class="file-upload-btn">📷 Fotoğraf Seç / Yükle</label>
+                <input type="file" id="avatar-input" accept="image/*" onchange="previewAvatar(event)" style="display: none;">
+            </div>
+
+            <input type="text" id="edit-username-input" placeholder="Yeni Kullanıcı Adı" class="auth-input">
+            <textarea id="edit-bio-input" placeholder="Hoşlandığım şeyler, hobilerim, favori oyunlarım..." rows="3" class="auth-input" style="resize: none;"></textarea>
+
+            <button type="button" onclick="saveProfileChanges()" class="auth-submit-btn" style="background: linear-gradient(135deg, #a855f7, #38bdf8);">Kaydet ✨</button>
+            <button type="button" onclick="closeProfileModal()" style="margin-top: 10px; background: transparent; border: none; color: #a78bfa; cursor: pointer; font-size: 0.85rem; display: block; width: 100%;">İptal</button>
+        </div>
+    </div>
+
+    <!-- BAŞKASININ PROFİLİNİ GÖRÜNTÜLEME MODALI -->
+    <div id="view-profile-modal" class="modal-overlay">
+        <div class="welcome-box modal-box" style="max-width: 380px; text-align: center;">
+            <div class="profile-preview-container">
+                <img id="view-modal-avatar" src="https://via.placeholder.com/100" alt="Profil">
+            </div>
+            <h3 id="view-modal-username" style="color: #e879f9; font-size: 1.5rem; margin-bottom: 5px;">Kullanıcı Adı</h3>
+            <p id="view-modal-role" style="color: #38bdf8; font-size: 0.85rem; font-weight: 600; margin-bottom: 15px;">Öğrenci</p>
+            
+            <div style="background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 12px; border: 1px solid rgba(168, 85, 247, 0.2); text-align: left; margin-bottom: 15px;">
+                <h5 style="color: #a78bfa; font-size: 0.85rem; margin-bottom: 6px;">❤️ HOŞLANDIĞI ŞEYLER & HOBİLER:</h5>
+                <p id="view-modal-bio" style="font-size: 0.9rem; color: #f1f5f9; line-height: 1.4; white-space: pre-line;">Belirtilmemiş.</p>
+            </div>
+
+            <button type="button" onclick="closeViewProfileModal()" class="auth-submit-btn" style="background: rgba(168, 85, 247, 0.3); border: 1px solid #a855f7;">Kapat</button>
+        </div>
+    </div>
+
+    <!-- EĞLENCE BÖLÜMÜ PIN POPUP -->
+    <div id="fun-pin-modal" class="modal-overlay">
+        <div class="welcome-box modal-box">
+            <h2 class="welcome-text" style="font-size: 1.8rem;">🔒 EĞLENCE ALANI</h2>
+            <p class="subtitle">Giriş İçin Eğlence PIN'ini Girin</p>
+            
+            <div class="pin-container">
+                <div class="pin-display">
+                    <span class="fun-dot dot"></span>
+                    <span class="fun-dot dot"></span>
+                    <span class="fun-dot dot"></span>
+                    <span class="fun-dot dot"></span>
+                </div>
+                <div class="keypad">
+                    <button type="button" onclick="pressFunKey('1')">1</button>
+                    <button type="button" onclick="pressFunKey('2')">2</button>
+                    <button type="button" onclick="pressFunKey('3')">3</button>
+                    <button type="button" onclick="pressFunKey('4')">4</button>
+                    <button type="button" onclick="pressFunKey('5')">5</button>
+                    <button type="button" onclick="pressFunKey('6')">6</button>
+                    <button type="button" onclick="pressFunKey('7')">7</button>
+                    <button type="button" onclick="pressFunKey('8')">8</button>
+                    <button type="button" onclick="pressFunKey('9')">9</button>
+                    <button type="button" class="action-btn" onclick="clearFunPin()">C</button>
+                    <button type="button" onclick="pressFunKey('0')">0</button>
+                    <button type="button" class="action-btn submit" onclick="checkFunPin()">GO</button>
+                </div>
+            </div>
+            <p id="fun-error-message" class="error-text"></p>
+            <button type="button" onclick="closeFunModal()" style="margin-top: 10px; background: transparent; border: none; color: #a78bfa; cursor: pointer; font-size: 0.85rem;">İptal Et</button>
+        </div>
+    </div>
+
+    <!-- 2. ÖĞRENCİ PANELİ -->
+    <div id="student-portal" class="portal-screen">
+        <aside class="sidebar">
+            <div id="main-student-menu">
+                <h2>8/D Sınıf Menüsü</h2>
+                <div id="user-profile-tag" style="color: #38bdf8; font-weight: 600; font-size: 0.85rem; margin-bottom: 10px;">Hoş geldin, <span id="logged-user-name">Öğrenci</span> 👋</div>
+                <ul>
+                    <li class="active" onclick="switchCategory('lgs-zamani', this)">⏳ LGS Zamanı</li>
+                    <li onclick="switchCategory('ders-programi', this)">1. Ders Programı</li>
+                    <li onclick="switchCategory('odevler', this)">2. Ödevler</li>
+                    <li onclick="switchCategory('sinavlar', this)">3. Sınıf Sınavları</li>
+                    <li onclick="switchCategory('denemeler', this)">4. Denemeler</li>
+                    <li onclick="switchCategory('yayinlar', this)">5. Deneme Yayınları</li>
+                    <li onclick="switchCategory('soru-sor', this)" style="background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; font-weight: bold; margin-top: 5px;">❓ 6. Soru Sor / Cevapla</li>
+                    <li onclick="openFunModal()" style="background: rgba(232, 121, 249, 0.15); border: 1px solid #e879f9; color: #e879f9; font-weight: bold; margin-top: 5px;">🎉 7. Eğlence</li>
+                </ul>
+            </div>
+
+            <div id="fun-student-menu" style="display: none;">
+                <h2 style="color: #38bdf8;">🎉 Eğlence Menüsü</h2>
+                <ul>
+                    <li class="active" onclick="switchCategory('oyunlar', this)">1. 🎮 Oyunlar</li>
+                    <li onclick="switchCategory('oyun-zamani', this)">2. ⏰ Oyun Zamanı</li>
+                    <li onclick="switchCategory('musaitlik', this)">3. 🟢 Müsaitlik</li>
+                    <li onclick="switchCategory('sohbet', this)" style="background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #e879f9; font-weight: bold; margin-top: 5px;">💬 4. Sohbet</li>
+                    <li onclick="switchCategory('gruplar', this)" style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #4ade80; font-weight: bold; margin-top: 5px;">👥 5. Gruplar</li>
+                </ul>
+                <button type="button" onclick="exitFunMenu()" style="width: 100%; margin-top: 15px; padding: 10px; background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #38bdf8; border-radius: 10px; cursor: pointer; font-weight: 600;">🔙 Sınıf Portalına Dön</button>
+            </div>
+
+            <div class="announcements-section">
+                <h3>📢 Sınıf Duyuruları</h3>
+                <div id="student-announcements-list" class="announcements-list">
+                    <div class="announcement-card empty-msg">Henüz duyuru yayınlanmadı.</div>
+                </div>
+            </div>
+
+            <button type="button" class="logout-btn" onclick="logout()">Çıkış Yap</button>
+        </aside>
+
+        <main class="content-area">
+            <div class="top-profile-bar">
+                <div class="profile-widget" onclick="openProfileModal()">
+                    <img id="top-avatar-img" src="https://via.placeholder.com/40?text=U" alt="Profil">
+                    <span id="top-username-text">Kullanıcı</span>
+                    <span style="font-size: 0.75rem; color: #a78bfa;">⚙️</span>
+                </div>
+            </div>
+
+            <section id="lgs-zamani" class="category-content active">
+                <h3>🎯 Liseye Geçiş Sınavı (LGS) Geri Sayım</h3>
+                <p style="color: #a78bfa; margin-bottom: 2rem;">LGS'ye Kalan Süre Canlı Olarak Takip Ediliyor!</p>
+                <div class="photo-card" style="padding: 2.5rem; text-align: center;">
+                    <h4 style="font-size: 1.5rem; color: #e879f9; margin-bottom: 2rem;">LGS 2027 Kalan Süre</h4>
+                    <div class="countdown-container">
+                        <div class="countdown-box"><span id="days">00</span><p>Gün</p></div>
+                        <div class="countdown-box"><span id="hours">00</span><p>Saat</p></div>
+                        <div class="countdown-box"><span id="minutes">00</span><p>Dakika</p></div>
+                        <div class="countdown-box"><span id="seconds">00</span><p>Saniye</p></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="ders-programi" class="category-content">
+                <h3>Kestel Toplu Konutlar Ortaokulu - 8/D Ders Programı</h3>
+                <div class="photo-card" style="padding: 1.5rem; overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: center; color: white;">
+                        <thead>
+                            <tr style="background: rgba(168, 85, 247, 0.3); border-bottom: 2px solid #a855f7;">
+                                <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.1);">Gün</th>
+                                <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.1);">1. Ders</th>
+                                <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.1);">2. Ders</th>
+                                <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.1);">3. Ders</th>
+                                <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.1);">4. Ders</th>
+                                <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.1);">5. Ders</th>
+                                <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.1);">6. Ders</th>
+                                <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.1);">7. Ders</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 10px; font-weight: bold; color: #e879f9;">Pazartesi</td>
+                                <td>ÇEVRE<br><small style="color:#a78bfa">ZEYNEP Ö.</small></td>
+                                <td>ÇEVRE<br><small style="color:#a78bfa">ZEYNEP Ö.</small></td>
+                                <td>DİN<br><small style="color:#a78bfa">M.NAÇ</small></td>
+                                <td>DİN<br><small style="color:#a78bfa">M.NAÇ</small></td>
+                                <td>İNG<br><small style="color:#a78bfa">SEBAHATTİN</small></td>
+                                <td>İNG<br><small style="color:#a78bfa">SEBAHATTİN</small></td>
+                                <td>FEN<br><small style="color:#a78bfa">SEDA</small></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 10px; font-weight: bold; color: #e879f9;">Salı</td>
+                                <td>Y.ZEKA<br><small style="color:#a78bfa">ÖZLEM</small></td>
+                                <td>BED.EĞT.<br><small style="color:#a78bfa">S.ATA</small></td>
+                                <td>BED.EĞT.<br><small style="color:#a78bfa">S.ATA</small></td>
+                                <td>İNG<br><small style="color:#a78bfa">SEBAHATTİN</small></td>
+                                <td>İNG<br><small style="color:#a78bfa">SEBAHATTİN</small></td>
+                                <td>FEN<br><small style="color:#a78bfa">SEDA</small></td>
+                                <td>FEN<br><small style="color:#a78bfa">SEDA</small></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 10px; font-weight: bold; color: #e879f9;">Çarşamba</td>
+                                <td>MAT<br><small style="color:#a78bfa">ÖZLEM</small></td>
+                                <td>MAT<br><small style="color:#a78bfa">ÖZLEM</small></td>
+                                <td>FEN<br><small style="color:#a78bfa">SEDA</small></td>
+                                <td>TEK.TAS<br><small style="color:#a78bfa">BERNA</small></td>
+                                <td>TEK.TAS<br><small style="color:#a78bfa">BERNA</small></td>
+                                <td>MÜZ<br><small style="color:#a78bfa">ERKAN</small></td>
+                                <td>TRKÇ<br><small style="color:#a78bfa">MERYEM</small></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 10px; font-weight: bold; color: #e879f9;">Perşembe</td>
+                                <td>REH<br><small style="color:#a78bfa">ÖZLEM</small></td>
+                                <td>MAT<br><small style="color:#a78bfa">ÖZLEM</small></td>
+                                <td>İNK.T.<br><small style="color:#a78bfa">ÇAĞLAYAN</small></td>
+                                <td>İNK.T.<br><small style="color:#a78bfa">ÇAĞLAYAN</small></td>
+                                <td>TRKÇ<br><small style="color:#a78bfa">MERYEM</small></td>
+                                <td>TRKÇ<br><small style="color:#a78bfa">MERYEM</small></td>
+                                <td>GÖR.S.<br><small style="color:#a78bfa">ESRA</small></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 10px; font-weight: bold; color: #e879f9;">Cuma</td>
+                                <td>MAT<br><small style="color:#a78bfa">ÖZLEM</small></td>
+                                <td>MAT<br><small style="color:#a78bfa">ÖZLEM</small></td>
+                                <td>S.SPOR<br><small style="color:#a78bfa">S.ATA</small></td>
+                                <td>S.SPOR<br><small style="color:#a78bfa">S.ATA</small></td>
+                                <td>TRKÇ<br><small style="color:#a78bfa">MERYEM</small></td>
+                                <td>TRKÇ<br><small style="color:#a78bfa">MERYEM</small></td>
+                                <td>Y.ZEKA<br><small style="color:#a78bfa">ÖZLEM</small></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="odevler" class="category-content">
+                <h3>Ödevler</h3>
+                <div class="gallery">
+                    <div class="photo-card">
+                        <img src="https://via.placeholder.com/400x300?text=Odevler" alt="Ödevler">
+                        <p>Bu Haftanın Ödev Görselleri</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="sinavlar" class="category-content">
+                <h3>Toplu Konutlar Ortaokulu 1. Dönem 1. Sınav Takvimi (8. Sınıf)</h3>
+                <div class="photo-card" style="padding: 1.5rem; overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: center; color: white;">
+                        <thead>
+                            <tr style="background: rgba(168, 85, 247, 0.3); border-bottom: 2px solid #a855f7;">
+                                <th style="padding: 12px; border: 1px solid rgba(255,255,255,0.1);">Tarih</th>
+                                <th style="padding: 12px; border: 1px solid rgba(255,255,255,0.1);">Gün</th>
+                                <th style="padding: 12px; border: 1px solid rgba(255,255,255,0.1);">Saat</th>
+                                <th style="padding: 12px; border: 1px solid rgba(255,255,255,0.1);">8. Sınıf Sınavı</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td>02.11.2026</td><td style="color: #e879f9; font-weight: bold;">Pazartesi</td><td>3. Ders</td><td style="color: #4ade80; font-weight: 600;">Görsel Sanatlar</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td rowspan="2" style="vertical-align: middle;">03.11.2026</td><td rowspan="2" style="color: #e879f9; font-weight: bold; vertical-align: middle;">Salı</td><td>3. Ders</td><td style="color: #4ade80; font-weight: 600;">Fen Bilimleri</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td>6. Ders</td><td>Seçmeli Kültür ve Med. Yön Verenler</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td rowspan="2" style="vertical-align: middle;">05.11.2026</td><td rowspan="2" style="color: #e879f9; font-weight: bold; vertical-align: middle;">Perşembe</td><td>3. Ders</td><td style="color: #4ade80; font-weight: 600;">Matematik</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td>6. Ders</td><td>Yapay Zeka Uygulamaları</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td>06.11.2026</td><td style="color: #e879f9; font-weight: bold;">Cuma</td><td>3. Ders</td><td style="color: #4ade80; font-weight: 600;">T.C. İnkılap Tarihi</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td rowspan="2" style="vertical-align: middle;">09.11.2026</td><td rowspan="2" style="color: #e879f9; font-weight: bold; vertical-align: middle;">Pazartesi</td><td>3. Ders</td><td>Beden Eğitimi ve Spor</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td>6. Ders</td><td>Seçmeli Spor ve Fiz. Etk.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td>10.11.2026</td><td style="color: #e879f9; font-weight: bold;">Salı</td><td>3. Ders</td><td style="color: #4ade80; font-weight: 600;">Türkçe</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td>11.11.2026</td><td style="color: #e879f9; font-weight: bold;">Çarşamba</td><td>3. Ders</td><td>Teknoloji Tasarım</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td rowspan="2" style="vertical-align: middle;">12.11.2026</td><td rowspan="2" style="color: #e879f9; font-weight: bold; vertical-align: middle;">Perşembe</td><td>3. Ders</td><td style="color: #4ade80; font-weight: 600;">İngilizce</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td>6. Ders</td><td>Müzik</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td>13.11.2026</td><td style="color: #e879f9; font-weight: bold;">Cuma</td><td>3. Ders</td><td style="color: #4ade80; font-weight: 600;">D.K.A.B. (Din Kültürü)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="denemeler" class="category-content">
+                <h3>Denemeler</h3>
+                <div class="gallery">
+                    <div class="photo-card">
+                        <img src="https://via.placeholder.com/400x300?text=Deneme+Sonuclari" alt="Denemeler">
+                        <p>Son Deneme Sonuçları</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="yayinlar" class="category-content">
+                <h3>8. Sınıf LGS Denemesi Yayınevleri</h3>
+                <div class="gallery">
+                    <div class="photo-card"><p>1. Hız Yayınları</p></div>
+                    <div class="photo-card"><p>2. Mozaik Yayınları</p></div>
+                    <div class="photo-card"><p>3. Nartest Yayınları</p></div>
+                    <div class="photo-card"><p>4. Özdebir Yayınları</p></div>
+                    <div class="photo-card"><p>5. Sinan Kuzucu Yayınları</p></div>
+                    <div class="photo-card"><p>6. Fenomen Yayınları</p></div>
+                    <div class="photo-card"><p>7. Okyanus Yayınları</p></div>
+                    <div class="photo-card"><p>8. Karekök Yayınları</p></div>
+                    <div class="photo-card"><p>9. Paraf Yayınları</p></div>
+                    <div class="photo-card"><p>10. Bilfen Yayınları</p></div>
+                    <div class="photo-card"><p>11. Sınav Yayınları</p></div>
+                    <div class="photo-card"><p>12. Arı Yayıncılık</p></div>
+                    <div class="photo-card"><p>13. Palme Yayınları</p></div>
+                    <div class="photo-card"><p>14. Aydın Yayınları</p></div>
+                    <div class="photo-card"><p>15. Tudem Yayınları</p></div>
+                    <div class="photo-card"><p>16. Kafa Dengi Yayınları</p></div>
+                    <div class="photo-card"><p>17. Limit Yayınları</p></div>
+                    <div class="photo-card"><p>18. Editör Yayınları</p></div>
+                    <div class="photo-card"><p>19. Ankara Yayıncılık</p></div>
+                    <div class="photo-card"><p>20. Bilgi Sarmal Yayınları</p></div>
+                    <div class="photo-card"><p>21. Muba Yayınları</p></div>
+                    <div class="photo-card"><p>22. Evrensel İletişim Yayınları</p></div>
+                    <div class="photo-card"><p>23. Yeni Tarz Yayınları</p></div>
+                    <div class="photo-card"><p>24. Beyin Takımı Yayınları</p></div>
+                    <div class="photo-card"><p>25. Krallar Karması</p></div>
+                    <div class="photo-card"><p>26. ÜçDörtBeş Yayınları</p></div>
+                    <div class="photo-card"><p>27. Tonguç Akademi</p></div>
+                    <div class="photo-card"><p>28. Günay Yayınları</p></div>
+                    <div class="photo-card"><p>29. Çanta Yayınları</p></div>
+                    <div class="photo-card"><p>30. Kurmay Yayınları</p></div>
+                    <div class="photo-card"><p>31. İsem Yayıncılık</p></div>
+                    <div class="photo-card"><p>32. Fen Bilimleri Yayınları</p></div>
+                    <div class="photo-card"><p>33. Kırmızı Beyaz Yayınları</p></div>
+                    <div class="photo-card"><p>34. More More Yayınları</p></div>
+                    <div class="photo-card"><p>35. Adım Adım Yayınları</p></div>
+                    <div class="photo-card"><p>36. Data Yayınları</p></div>
+                    <div class="photo-card"><p>37. Yarı Çap Yayınları</p></div>
+                    <div class="photo-card"><p>38. Çap Yayınları</p></div>
+                    <div class="photo-card"><p>39. Test Okul Yayınları</p></div>
+                    <div class="photo-card"><p>40. Puan Yayınları</p></div>
+                    <div class="photo-card"><p>41. Esen Yayınları</p></div>
+                    <div class="photo-card"><p>42. Son Viraj Yayınları</p></div>
+                    <div class="photo-card"><p>43. Marka Yayınları</p></div>
+                    <div class="photo-card"><p>44. Master Türkçe Yayınları</p></div>
+                    <div class="photo-card"><p>45. IQ Yayınları</p></div>
+                    <div class="photo-card"><p>46. Akıllı Adam Yayınları</p></div>
+                    <div class="photo-card"><p>47. Güçlendiren Yayınları</p></div>
+                    <div class="photo-card"><p>48. Ünlü Yayınları</p></div>
+                    <div class="photo-card"><p>49. Newton Yayınları</p></div>
+                    <div class="photo-card"><p>50. Bilgi Küpü Yayınları</p></div>
+                </div>
+            </section>
+
+            <section id="soru-sor" class="category-content">
+                <h3>❓ Soru Sor & Cevapla (8/D Soru Panosu)</h3>
+                <p style="color: #a78bfa; margin-bottom: 1.5rem;">Yapamadığın LGS ve ders sorularını sor, arkadaşların çözümünü yazsın!</p>
+
+                <div class="photo-card" style="padding: 1.8rem; margin-bottom: 2rem; text-align: left;">
+                    <h4 style="color: #38bdf8; margin-bottom: 1rem; font-size: 1.1rem;">📝 Yeni Soru Sor</h4>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <input type="text" id="asker-name-input" placeholder="Adınız..." style="flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(56,189,248,0.4); background: rgba(0,0,0,0.4); color: white;">
+                        <input type="text" id="question-subject-input" placeholder="Ders / Konu (Örn: Mat - Üslü Sayılar)" style="flex: 2; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(56,189,248,0.4); background: rgba(0,0,0,0.4); color: white;">
+                    </div>
+                    <textarea id="question-text-input" placeholder="Sorunuzu detaylıca buraya yazın..." rows="3" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(56,189,248,0.4); background: rgba(0,0,0,0.4); color: white; margin-bottom: 12px; resize: none;"></textarea>
+                    <button type="button" onclick="addQuestion()" style="padding: 10px 22px; background: linear-gradient(135deg, #38bdf8, #0284c7); border: none; color: white; font-weight: bold; border-radius: 10px; cursor: pointer; box-shadow: 0 0 15px rgba(56,189,248,0.3);">Soruyu Yayınla</button>
+                </div>
+
+                <div id="questions-container" style="display: flex; flex-direction: column; gap: 18px;">
+                    <p style="color: #64748b; font-size: 0.95rem; text-align: center;">Henüz hiç soru sorulmadı. İlk soruyu sen sor!</p>
+                </div>
+            </section>
+
+            <section id="oyunlar" class="category-content">
+                <h3>🎮 Oyunlar</h3>
+                <p style="color: #a78bfa; margin-bottom: 1.5rem;">Sınıfça Oynadığımız Favori Oyuncu Odaları ve Oyunlar</p>
+                <div class="gallery">
+                    <div class="photo-card"><p style="font-size: 1.2rem; font-weight: bold; color: #e879f9;">ඞ Among Us</p></div>
+                    <div class="photo-card"><p style="font-size: 1.2rem; font-weight: bold; color: #38bdf8;">⚡ Fortnite</p></div>
+                    <div class="photo-card"><p style="font-size: 1.2rem; font-weight: bold; color: #facc15;">⭐ Brawl Stars</p></div>
+                </div>
+            </section>
+
+            <section id="oyun-zamani" class="category-content">
+                <h3>⏰ Oyun Zamanı</h3>
+                <p style="color: #a78bfa; margin-bottom: 1.5rem;">Cuma Günü Saat 20:30'daki Oyun Zamanına Kalan Süre</p>
+                <div class="photo-card" style="padding: 2rem; text-align: center;">
+                    <h4 style="font-size: 1.3rem; color: #38bdf8; margin-bottom: 1.5rem;">🎮 Gelecek Oyun Etkinliği (Cuma 20:30)</h4>
+                    <div class="countdown-container">
+                        <div class="countdown-box" style="border-color: #38bdf8;"><span id="game-hours" style="color: #38bdf8;">00</span><p>Saat</p></div>
+                        <div class="countdown-box" style="border-color: #38bdf8;"><span id="game-minutes" style="color: #38bdf8;">00</span><p>Dakika</p></div>
+                        <div class="countdown-box" style="border-color: #38bdf8;"><span id="game-seconds" style="color: #38bdf8;">00</span><p>Saniye</p></div>
+                    </div>
+                    <p style="margin-top: 1.5rem; font-size: 1.1rem; color: #22c55e; font-weight: 600;">
+                        📲 Geri sayım bittiğinde WhatsApp'tan aranacaksınız!
+                    </p>
+                </div>
+            </section>
+
+            <section id="musaitlik" class="category-content">
+                <h3>🟢 Müsaitlik Durumu</h3>
+                <p style="color: #a78bfa; margin-bottom: 1.5rem;">Müsait Olan İsmini Yazıp Eklenebilir!</p>
+                <div class="photo-card" style="padding: 2rem; text-align: left;">
+                    <h4 style="font-size: 1.2rem; color: #38bdf8; margin-bottom: 1.2rem; text-align: center;">Müsait Olanlar Listesi</h4>
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <input type="text" id="student-name-input" placeholder="Adınızı yazın..." style="flex: 1; padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.4); background: rgba(0,0,0,0.4); color: white; font-size: 0.95rem;">
+                        <button type="button" onclick="addAvailability()" style="padding: 12px 20px; background: linear-gradient(135deg, #38bdf8, #0284c7); border: none; color: white; font-weight: bold; border-radius: 12px; cursor: pointer;">Müsaitim (Ekle)</button>
+                    </div>
+                    <div id="student-available-list" style="display: flex; flex-direction: column; gap: 10px;">
+                        <p style="color: #64748b; font-size: 0.9rem; text-align: center;">Henüz kimse ismini yazmadı.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="sohbet" class="category-content">
+                <h3>💬 8/D Canlı Sohbet Odası</h3>
+                <p style="color: #a78bfa; margin-bottom: 1rem;">Sınıf arkadaşlarınla anlık yazış!</p>
+
+                <div class="chat-container">
+                    <div class="chat-messages-box"></div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-author-input" placeholder="Adın..." style="width: 25%; display: none;">
+                        <input type="text" id="chat-message-input" placeholder="Bir mesaj yazın..." style="flex: 1;" onkeypress="handleChatEnter(event)">
+                        <button type="button" onclick="sendChatMessage()" class="chat-send-btn">Gönder 🚀</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="gruplar" class="category-content">
+                <h3>👥 Sınıf Grupları</h3>
+                <p style="color: #a78bfa; margin-bottom: 1.5rem;">Sınıf içi iletişim ve sosyal medya gruplarımız</p>
+                <div class="photo-card" style="padding: 2.5rem; text-align: center; border: 1px solid rgba(34, 197, 94, 0.4);">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">💬</div>
+                    <h4 style="font-size: 1.4rem; color: #4ade80; margin-bottom: 1rem;">WhatsApp Sınıf Grubu</h4>
+                    <p style="font-size: 1.1rem; color: #f1f5f9; font-weight: 600; line-height: 1.6;">
+                        Whatsapp gurubumuzda yokmusun yöneticiyle iletişime geç
+                    </p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 3. YÖNETİCİ PANELİ (ADMIN PORTAL) -->
+    <div id="teacher-portal" class="portal-screen">
+        <aside class="sidebar teacher-sidebar">
+            <h2>🛠️ Yönetici Paneli</h2>
+            <ul>
+                <li class="active" onclick="switchTeacherCategory('t-ders-programi', this)">1. Ders Programı Yönetimi</li>
+                <li onclick="switchTeacherCategory('t-odevler', this)">2. Ödev Yönetimi</li>
+                <li onclick="switchTeacherCategory('t-ornek-sinavlar', this)">3. Sınav Yönetimi</li>
+                <li onclick="switchTeacherCategory('t-yayinlar', this)">4. Deneme Yayınları Yönetimi</li>
+                <li onclick="switchTeacherCategory('t-duyuru-ekle', this)">5. Duyuru & İçerik Yönetimi</li>
+                <li onclick="switchTeacherCategory('t-musaitlik-takip', this)" style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #4ade80; font-weight: bold; margin-top: 10px;">🟢 6. Müsaitlik Takibi</li>
+                <li onclick="switchTeacherCategory('t-user-management', this)" style="background: rgba(232, 121, 249, 0.15); border: 1px solid #e879f9; color: #e879f9; font-weight: bold; margin-top: 5px;">👥 7. Hesaplar & Yetki Yönetimi</li>
+                <li onclick="switchTeacherCategory('t-fun-area', this)" style="background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; font-weight: bold; margin-top: 5px;">🎉 8. Eğlence Alanı</li>
+            </ul>
+
+            <div class="announcements-section">
+                <h3>📢 Yayınlanan Duyurular</h3>
+                <div id="teacher-announcements-list" class="announcements-list">
+                    <div class="announcement-card empty-msg">Henüz duyuru eklenmedi.</div>
+                </div>
+            </div>
+
+            <button type="button" class="logout-btn" onclick="logout()">Çıkış Yap</button>
+        </aside>
+
+        <main class="content-area">
+            <section id="t-ders-programi" class="category-content active">
+                <h3>🛠️ Yönetici - Ders Programı Yönetimi</h3>
+                <div class="gallery">
+                    <div class="photo-card"><img src="https://via.placeholder.com/400x300?text=Yonetici+Ders+Programi" alt="Ders Programı"><p>Güncel Sınıf Ders Programını Düzenleyin</p></div>
+                </div>
+            </section>
+
+            <section id="t-odevler" class="category-content">
+                <h3>🛠️ Yönetici - Ödev Kontrolü ve Yönetimi</h3>
+                <div class="gallery">
+                    <div class="photo-card"><img src="https://via.placeholder.com/400x300?text=Verilen+Odevler" alt="Ödevler"><p>Sınıfa Verilen Ödevleri Ekle / Sil</p></div>
+                </div>
+            </section>
+
+            <section id="t-ornek-sinavlar" class="category-content">
+                <h3>🛠️ Yönetici - Sınav Takvimi ve Sınav Soruları</h3>
+                <div class="gallery">
+                    <div class="photo-card"><img src="https://via.placeholder.com/400x300?text=Ornek+Sinavlar" alt="Örnek Sınavlar"><p>Sınav Takvimini ve Sorularını Yönetin</p></div>
+                </div>
+            </section>
+
+            <section id="t-yayinlar" class="category-content">
+                <h3>🛠️ Yönetici - Tavsiye Edilen Yayınlar</h3>
+                <div class="gallery">
+                    <div class="photo-card"><img src="https://via.placeholder.com/400x300?text=Tavsiye+Yayinlar" alt="Deneme Yayınları"><p>LGS Deneme Yayınevlerini Düzenleyin</p></div>
+                </div>
+            </section>
+
+            <section id="t-duyuru-ekle" class="category-content">
+                <h3>🛠️ Sınıf Duyurusu Ekle & Yönet</h3>
+                <div class="photo-card" style="padding: 2rem; text-align: left; margin-bottom: 2rem;">
+                    <p style="margin-bottom: 8px; font-weight: 600;">Duyuru Başlığı:</p>
+                    <input type="text" id="announcement-title" placeholder="Örn: Yarınki Matematik Yazılısı Hakkında" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(168,85,247,0.4); background: rgba(0,0,0,0.4); color: white; margin-bottom: 15px;">
+                    <p style="margin-bottom: 8px; font-weight: 600;">Duyuru Detayı:</p>
+                    <textarea id="announcement-text" placeholder="Duyuru içeriğini buraya yazabilirsiniz..." rows="4" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(168,85,247,0.4); background: rgba(0,0,0,0.4); color: white; margin-bottom: 15px; resize: none;"></textarea>
+                    <button type="button" onclick="publishAnnouncement()" style="padding: 12px 24px; background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: white; border-radius: 10px; cursor: pointer; font-weight: 600;">Duyuruyu Yayınla</button>
+                </div>
+                <div id="teacher-manage-announcements-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
+            </section>
+
+            <section id="t-musaitlik-takip" class="category-content">
+                <h3>🟢 Canlı Müsaitlik Takibi</h3>
+                <div class="photo-card" style="padding: 2rem; text-align: left;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h4 style="font-size: 1.2rem; color: #22c55e;">Oyuna Hazır Olanlar (<span id="available-count">0</span> Kişi)</h4>
+                        <button type="button" onclick="resetAvailabilityList()" style="padding: 8px 14px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; border-radius: 8px; cursor: pointer;">Listeyi Temizle</button>
+                    </div>
+                    <div id="admin-availability-display" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+                </div>
+            </section>
+
+            <section id="t-user-management" class="category-content">
+                <h3>👥 Kullanıcı Hesapları & Yetki Yönetimi</h3>
+                <div class="photo-card" style="padding: 1.8rem; text-align: left;">
+                    <div id="user-accounts-list" class="user-manage-list"></div>
+                </div>
+            </section>
+
+            <section id="t-fun-area" class="category-content">
+                <h3>🎉 Yönetici Eğlence & İletişim Paneli</h3>
+                <div class="chat-container">
+                    <div class="chat-messages-box"></div>
+                    <div class="chat-input-area">
+                        <input type="text" id="admin-chat-message-input" placeholder="Yönetici olarak mesaj yazın..." style="flex: 1;" onkeypress="handleAdminChatEnter(event)">
+                        <button type="button" onclick="sendAdminChatMessage()" class="chat-send-btn">Gönder 👑</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- HAREKETLİ VE DURUM DEĞİŞTİREN KEDİ -->
+    <div id="pet-cat" class="pet-cat sitting">
+        <div class="cat-body">
+            <div class="cat-ears"></div>
+            <div class="cat-face">
+                <div class="cat-eyes"></div>
+                <div class="cat-nose"></div>
+            </div>
+            <div class="cat-paws"></div>
+            <div class="cat-tail"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

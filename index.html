@@ -32,7 +32,6 @@
                 <div id="cyber-loader-bar" class="cyber-loader-bar"></div>
             </div>
 
-            <!-- GÖSTERMELİK TARAMA MADDELERİ -->
             <div class="scan-items-container">
                 <div id="scan-item-1" class="scan-item"><span>[ ⏳ ]</span> VİRÜS KONTROLÜ</div>
                 <div id="scan-item-2" class="scan-item"><span>[ ⏳ ]</span> RAT & TROJAN KONTROLÜ</div>
@@ -220,8 +219,7 @@
                     <li onclick="switchCategory('sinavlar', this)">3. Sınıf Sınavları</li>
                     <li onclick="switchCategory('denemeler', this)">4. Denemeler</li>
                     <li onclick="switchCategory('yayinlar', this)">5. Deneme Yayınları</li>
-                    <li onclick="switchCategory('soru-sor', this)" style="background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; font-weight: bold;">❓ 6. Soru Sor / Cevapla</li>
-                    <li onclick="openFunModal()" style="background: rgba(232, 121, 249, 0.15); border: 1px solid #e879f9; color: #e879f9; font-weight: bold;">🎉 7. Eğlence</li>
+                    <li onclick="openFunModal()" style="background: rgba(232, 121, 249, 0.15); border: 1px solid #e879f9; color: #e879f9; font-weight: bold;">🎉 6. Eğlence</li>
                 </ul>
             </div>
 
@@ -231,8 +229,7 @@
                     <li class="active" onclick="switchCategory('oyunlar', this)">1. 🎮 Oyunlar</li>
                     <li onclick="switchCategory('oyun-zamani', this)">2. ⏰ Oyun Zamanı</li>
                     <li onclick="switchCategory('musaitlik', this)">3. 🟢 Müsaitlik</li>
-                    <li onclick="switchCategory('sohbet', this)" style="background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #e879f9; font-weight: bold;">💬 4. Sohbet</li>
-                    <li onclick="switchCategory('gruplar', this)" style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #4ade80; font-weight: bold;">👥 5. Gruplar</li>
+                    <li onclick="switchCategory('gruplar', this)" style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #4ade80; font-weight: bold;">👥 4. Gruplar</li>
                     <li onclick="exitFunMenu()" style="background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #38bdf8; font-weight: bold;">🔙 Sınıf Portalına Dön</li>
                 </ul>
             </div>
@@ -475,25 +472,6 @@
                 </div>
             </section>
 
-            <section id="soru-sor" class="category-content">
-                <h3>❓ Soru Sor & Cevapla (8/D Soru Panosu)</h3>
-                <p style="color: #a78bfa; margin-bottom: 1.5rem;">Yapamadığın LGS ve ders sorularını sor, arkadaşların çözümünü yazsın!</p>
-
-                <div class="photo-card" style="padding: 1.8rem; margin-bottom: 2rem; text-align: left;">
-                    <h4 style="color: #38bdf8; margin-bottom: 1rem; font-size: 1.1rem;">📝 Yeni Soru Sor</h4>
-                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                        <input type="text" id="asker-name-input" placeholder="Adınız..." style="flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(56,189,248,0.4); background: rgba(0,0,0,0.4); color: white;">
-                        <input type="text" id="question-subject-input" placeholder="Ders / Konu (Örn: Mat - Üslü Sayılar)" style="flex: 2; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(56,189,248,0.4); background: rgba(0,0,0,0.4); color: white;">
-                    </div>
-                    <textarea id="question-text-input" placeholder="Sorunuzu detaylıca buraya yazın..." rows="3" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(56,189,248,0.4); background: rgba(0,0,0,0.4); color: white; margin-bottom: 12px; resize: none;"></textarea>
-                    <button type="button" onclick="addQuestion()" style="padding: 10px 22px; background: linear-gradient(135deg, #38bdf8, #0284c7); border: none; color: white; font-weight: bold; border-radius: 10px; cursor: pointer; box-shadow: 0 0 15px rgba(56,189,248,0.3);">Soruyu Yayınla</button>
-                </div>
-
-                <div id="questions-container" style="display: flex; flex-direction: column; gap: 18px;">
-                    <p style="color: #64748b; font-size: 0.95rem; text-align: center;">Henüz hiç soru sorulmadı. İlk soruyu sen sor!</p>
-                </div>
-            </section>
-
             <section id="oyunlar" class="category-content">
                 <h3>🎮 Oyunlar</h3>
                 <p style="color: #a78bfa; margin-bottom: 1.5rem;">Sınıfça Oynadığımız Favori Oyuncu Odaları ve Oyunlar</p>
@@ -535,20 +513,6 @@
                 </div>
             </section>
 
-            <section id="sohbet" class="category-content">
-                <h3>💬 8/D Canlı Sohbet Odası</h3>
-                <p style="color: #a78bfa; margin-bottom: 1rem;">Sınıf arkadaşlarınla anlık yazış!</p>
-
-                <div class="chat-container">
-                    <div class="chat-messages-box"></div>
-                    <div class="chat-input-area">
-                        <input type="text" id="chat-author-input" placeholder="Adın..." style="width: 25%; display: none;">
-                        <input type="text" id="chat-message-input" placeholder="Bir mesaj yazın..." style="flex: 1;" onkeypress="handleChatEnter(event)">
-                        <button type="button" onclick="sendChatMessage()" class="chat-send-btn">Gönder 🚀</button>
-                    </div>
-                </div>
-            </section>
-
             <section id="gruplar" class="category-content">
                 <h3>👥 Sınıf Grupları</h3>
                 <p style="color: #a78bfa; margin-bottom: 1.5rem;">Sınıf içi iletişim ve sosyal medya gruplarımız</p>
@@ -575,7 +539,6 @@
                 <li onclick="switchTeacherCategory('t-duyuru-ekle', this)">5. Duyuru & İçerik Yönetimi</li>
                 <li onclick="switchTeacherCategory('t-musaitlik-takip', this)" style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #4ade80; font-weight: bold;">🟢 6. Müsaitlik Takibi</li>
                 <li onclick="switchTeacherCategory('t-user-management', this)" style="background: rgba(232, 121, 249, 0.15); border: 1px solid #e879f9; color: #e879f9; font-weight: bold;">👥 7. Hesaplar & Yetki Yönetimi</li>
-                <li onclick="switchTeacherCategory('t-fun-area', this)" style="background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; font-weight: bold;">🎉 8. Eğlence Alanı</li>
             </ul>
 
             <div class="announcements-section">
@@ -644,17 +607,6 @@
                 <h3>👥 Kullanıcı Hesapları & Yetki Yönetimi</h3>
                 <div class="photo-card" style="padding: 1.8rem; text-align: left;">
                     <div id="user-accounts-list" class="user-manage-list"></div>
-                </div>
-            </section>
-
-            <section id="t-fun-area" class="category-content">
-                <h3>🎉 Yönetici Eğlence & İletişim Paneli</h3>
-                <div class="chat-container">
-                    <div class="chat-messages-box"></div>
-                    <div class="chat-input-area">
-                        <input type="text" id="admin-chat-message-input" placeholder="Yönetici olarak mesaj yazın..." style="flex: 1;" onkeypress="handleAdminChatEnter(event)">
-                        <button type="button" onclick="sendAdminChatMessage()" class="chat-send-btn">Gönder 👑</button>
-                    </div>
                 </div>
             </section>
         </main>

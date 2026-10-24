@@ -1,9 +1,11 @@
 // ====================================================
-// 0. İLK GİRİŞ TARAMA SİMÜLASYONU VE DİZİLER
+// 0. FIREBASE CANLI VERİTABANI BAĞLANTISI
 // ====================================================
-let availableUsers = JSON.parse(localStorage.getItem('8d_available_users')) || [];
-let questionsList = JSON.parse(localStorage.getItem('8d_questions')) || []; 
-let chatMessages = JSON.parse(localStorage.getItem('8d_chat_messages')) || [];
+const FIREBASE_URL = "https://toplu8d-default-rtdb.firebaseio.com";
+
+let availableUsers = [];
+let questionsList = []; 
+let chatMessages = [];
 let userAccounts = JSON.parse(localStorage.getItem('8d_accounts')) || [];
 let currentUser = JSON.parse(localStorage.getItem('8d_current_user')) || null;
 let tempAvatarBase64 = null;
@@ -13,29 +15,86 @@ window.addEventListener('DOMContentLoaded', () => {
 
     startLGSCountdown();
     startGameCountdown();
-    renderStudentAvailability();
-    renderAdminAvailability();
-    renderQuestions();
-    renderChat();
-    renderUserAccountsManagement();
+    
+    // Sunucudan (Firebase) Canlı Verileri Dinle ve Getir
+    listenToFirebaseChat();
+    listenToFirebaseQuestions();
+    listenToFirebaseAvailability();
 
-    // Diğer sekmelerde/cihazlarda atılan mesajları anında ekrana düşürür
-    window.addEventListener('storage', (e) => {
-        if (e.key === '8d_chat_messages') {
-            chatMessages = JSON.parse(e.newValue) || [];
-            renderChat();
-        }
-        if (e.key === '8d_questions') {
-            questionsList = JSON.parse(e.newValue) || [];
-            renderQuestions();
-        }
-        if (e.key === '8d_available_users') {
-            availableUsers = JSON.parse(e.newValue) || [];
-            renderStudentAvailability();
-            renderAdminAvailability();
-        }
-    });
+    renderUserAccountsManagement();
 });
+
+// Firebase'e Veri Gönderme Fonksiyonu (PUT)
+async function sendToFirebase(path, data) {
+    try {
+        await fetch(`${FIREBASE_URL}/${path}.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+    } catch (err) {
+        console.error("Firebase veri gönderim hatası:", err);
+    }
+}
+
+// Firebase'den Anlık Sohbet Mesajlarını Dinleme (1.5 saniyede bir günceller)
+function listenToFirebaseChat() {
+    setInterval(async () => {
+        try {
+            const res = await fetch(`${FIREBASE_URL}/chatMessages.json`);
+            const data = await res.json();
+            if (data) {
+                chatMessages = Array.isArray(data) ? data : Object.values(data);
+                renderChat();
+            } else {
+                chatMessages = [];
+                renderChat();
+            }
+        } catch (err) {
+            console.error("Sohbet çekme hatası:", err);
+        }
+    }, 1500);
+}
+
+// Firebase'den Anlık Soruları Dinleme
+function listenToFirebaseQuestions() {
+    setInterval(async () => {
+        try {
+            const res = await fetch(`${FIREBASE_URL}/questions.json`);
+            const data = await res.json();
+            if (data) {
+                questionsList = Array.isArray(data) ? data : Object.values(data);
+                renderQuestions();
+            } else {
+                questionsList = [];
+                renderQuestions();
+            }
+        } catch (err) {
+            console.error("Soru çekme hatası:", err);
+        }
+    }, 2000);
+}
+
+// Firebase'den Müsaitlik Listesini Dinleme
+function listenToFirebaseAvailability() {
+    setInterval(async () => {
+        try {
+            const res = await fetch(`${FIREBASE_URL}/availableUsers.json`);
+            const data = await res.json();
+            if (data) {
+                availableUsers = Array.isArray(data) ? data : Object.values(data);
+                renderStudentAvailability();
+                renderAdminAvailability();
+            } else {
+                availableUsers = [];
+                renderStudentAvailability();
+                renderAdminAvailability();
+            }
+        } catch (err) {
+            console.error("Müsaitlik çekme hatası:", err);
+        }
+    }, 2000);
+}
 
 function runSecurityScanSimulation() {
     const statusText = document.getElementById('scan-status-text');
@@ -419,7 +478,7 @@ function renderUserAccountsManagement() {
 }
 
 // ====================================================
-// 5. SOHBET (CHAT) SİSTEMİ - ANLIK HERKESE AÇIK
+// 5. SOHBET (CHAT) SİSTEMİ - FIREBASE CANLI MESAJLAŞMA
 // ====================================================
 function containsBadWord(text) {
     const cleanText = text.toLowerCase().replace(/[^a-zA-ZçğıöşüÇĞİÖŞÜ0-9\s]/g, "");
@@ -466,7 +525,7 @@ function sendChatMessage() {
     };
 
     chatMessages.push(newMsg);
-    localStorage.setItem('8d_chat_messages', JSON.stringify(chatMessages));
+    sendToFirebase('chatMessages', chatMessages);
 
     msgInput.value = "";
     renderChat();
@@ -503,7 +562,7 @@ function sendAdminChatMessage() {
     };
 
     chatMessages.push(newMsg);
-    localStorage.setItem('8d_chat_messages', JSON.stringify(chatMessages));
+    sendToFirebase('chatMessages', chatMessages);
 
     input.value = "";
     renderChat();
@@ -519,7 +578,7 @@ function handleAdminChatEnter(e) {
 
 function deleteChatMessage(id) {
     chatMessages = chatMessages.filter(m => m.id !== id);
-    localStorage.setItem('8d_chat_messages', JSON.stringify(chatMessages));
+    sendToFirebase('chatMessages', chatMessages);
     renderChat();
 }
 
@@ -599,7 +658,7 @@ function addQuestion() {
     };
 
     questionsList.unshift(newQuestion);
-    localStorage.setItem('8d_questions', JSON.stringify(questionsList));
+    sendToFirebase('questions', questionsList);
 
     subjectInput.value = "";
     textInput.value = "";
@@ -610,7 +669,7 @@ function addQuestion() {
 function deleteQuestion(id) {
     if (confirm("Bu soruyu silmek istediğinize emin misiniz?")) {
         questionsList = questionsList.filter(q => q.id !== id);
-        localStorage.setItem('8d_questions', JSON.stringify(questionsList));
+        sendToFirebase('questions', questionsList);
         renderQuestions();
     }
 }
@@ -636,12 +695,13 @@ function addAnswer(questionId) {
 
     const question = questionsList.find(q => q.id === questionId);
     if (question) {
+        if (!question.answers) question.answers = [];
         question.answers.push({
             author: currentUser.username,
             avatar: currentUser.avatar || DEFAULT_AVATAR,
             text: text
         });
-        localStorage.setItem('8d_questions', JSON.stringify(questionsList));
+        sendToFirebase('questions', questionsList);
         renderQuestions();
     }
 }
@@ -658,14 +718,16 @@ function renderQuestions() {
     let html = "";
     questionsList.forEach(q => {
         let answersHtml = "";
-        q.answers.forEach(a => {
-            answersHtml += `
-                <div class="answer-item">
-                    <span class="answer-author clickable-profile" onclick="viewUserProfile('${a.author}')">💬 ${a.author}:</span>
-                    <span>${a.text}</span>
-                </div>
-            `;
-        });
+        if (q.answers) {
+            q.answers.forEach(a => {
+                answersHtml += `
+                    <div class="answer-item">
+                        <span class="answer-author clickable-profile" onclick="viewUserProfile('${a.author}')">💬 ${a.author}:</span>
+                        <span>${a.text}</span>
+                    </div>
+                `;
+            });
+        }
 
         html += `
             <div class="question-card">
@@ -713,7 +775,7 @@ function addAvailability() {
     }
 
     availableUsers.push(name);
-    localStorage.setItem('8d_available_users', JSON.stringify(availableUsers));
+    sendToFirebase('availableUsers', availableUsers);
     input.value = "";
 
     renderStudentAvailability();
@@ -722,7 +784,7 @@ function addAvailability() {
 
 function removeAvailability(index) {
     availableUsers.splice(index, 1);
-    localStorage.setItem('8d_available_users', JSON.stringify(availableUsers));
+    sendToFirebase('availableUsers', availableUsers);
     renderStudentAvailability();
     renderAdminAvailability();
 }
@@ -771,7 +833,7 @@ function renderAdminAvailability() {
 function resetAvailabilityList() {
     if (confirm("Müsaitlik listesini tamamen temizlemek istediğinize emin misiniz?")) {
         availableUsers = [];
-        localStorage.setItem('8d_available_users', JSON.stringify(availableUsers));
+        sendToFirebase('availableUsers', availableUsers);
         renderStudentAvailability();
         renderAdminAvailability();
     }

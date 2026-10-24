@@ -1007,7 +1007,32 @@ body {
     }
 }
 /* ====================================================
-   PIXEL ART MINIK NOKTA GÖZLÜ MOR KEDİ
+   1. SİTE İÇİ NEON MOUSE DUMAN / PARÇACIK EFEKTİ
+   ==================================================== */
+.cursor-particle {
+    position: fixed;
+    pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(circle, #e879f9 0%, #a855f7 60%, rgba(168, 85, 247, 0) 100%);
+    box-shadow: 0 0 10px #e879f9, 0 0 20px #a855f7;
+    z-index: 99999;
+    animation: smokeFade 0.7s ease-out forwards;
+}
+
+@keyframes smokeFade {
+    0% {
+        opacity: 0.9;
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(3) rotate(45deg);
+        filter: blur(4px);
+    }
+}
+
+/* ====================================================
+   2. PIXEL ART MOR KEDİ (SADECE GİRİŞTE GÖRÜNÜR)
    ==================================================== */
 .pet-cat {
     position: fixed;
@@ -1015,7 +1040,12 @@ body {
     height: 32px;
     pointer-events: none;
     z-index: 9999;
-    transition: transform 0.1s ease-out;
+    transition: transform 0.1s ease-out, opacity 0.5s ease;
+}
+
+/* Giriş ekranı dışındayken gizleme */
+.pet-cat.hidden {
+    display: none !important;
 }
 
 /* Kedi Gövdesi (Pixel Mor) */
@@ -1029,7 +1059,7 @@ body {
     box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
 }
 
-/* Dik Kulaklar (Yarasa Havası) */
+/* Dik Kulaklar */
 .cat-ears::before,
 .cat-ears::after {
     content: '';
@@ -1044,7 +1074,7 @@ body {
 .cat-ears::before { left: 2px; }
 .cat-ears::after { right: 2px; }
 
-/* Nokta Kadar Küçük Minik Gözler */
+/* Nokta Minik Gözler */
 .cat-eyes {
     position: absolute;
     top: 9px;
@@ -1112,7 +1142,7 @@ body {
     border-radius: 0 6px 0 0;
 }
 
-/* 🏃‍♂️ KOŞMA ANIMASYONU (Fare Hareket Ederken) */
+/* 🏃‍♂️ KOŞMA ANIMASYONU */
 .pet-cat.running {
     animation: catRun 0.25s infinite alternate;
 }
@@ -1122,7 +1152,7 @@ body {
     100% { transform: translateY(-4px) rotate(4deg); }
 }
 
-/* 💤 UYKU ANIMASYONU (Fare Durduğunda) */
+/* 💤 UYKU ANIMASYONU */
 .pet-cat.sleeping {
     transform: scaleY(0.7) translateY(6px);
 }

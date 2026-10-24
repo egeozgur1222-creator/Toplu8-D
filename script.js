@@ -1,11 +1,11 @@
 // ====================================================
 // 0. İLK GİRİŞ TARAMA SİMÜLASYONU VE DİZİLER
 // ====================================================
-let availableUsers = [];
-let questionsList = []; 
-let chatMessages = [];
+let availableUsers = JSON.parse(localStorage.getItem('8d_available_users')) || [];
+let questionsList = JSON.parse(localStorage.getItem('8d_questions')) || []; 
+let chatMessages = JSON.parse(localStorage.getItem('8d_chat_messages')) || [];
 let userAccounts = JSON.parse(localStorage.getItem('8d_accounts')) || [];
-let currentUser = null;
+let currentUser = JSON.parse(localStorage.getItem('8d_current_user')) || null;
 let tempAvatarBase64 = null;
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -18,6 +18,23 @@ window.addEventListener('DOMContentLoaded', () => {
     renderQuestions();
     renderChat();
     renderUserAccountsManagement();
+
+    // Diğer sekmelerde/cihazlarda atılan mesajları anında ekrana düşürür
+    window.addEventListener('storage', (e) => {
+        if (e.key === '8d_chat_messages') {
+            chatMessages = JSON.parse(e.newValue) || [];
+            renderChat();
+        }
+        if (e.key === '8d_questions') {
+            questionsList = JSON.parse(e.newValue) || [];
+            renderQuestions();
+        }
+        if (e.key === '8d_available_users') {
+            availableUsers = JSON.parse(e.newValue) || [];
+            renderStudentAvailability();
+            renderAdminAvailability();
+        }
+    });
 });
 
 function runSecurityScanSimulation() {
@@ -100,7 +117,7 @@ let enteredPin = "";
 let enteredFunPin = "";
 let wrongAttempts = 0;
 let isLocked = false;
-let announcements = [];
+let announcements = JSON.parse(localStorage.getItem('8d_announcements')) || [];
 
 // ====================================================
 // 2. HESAP GİRİŞİ, KAYIT & PORTAL YÖNLENDİRME
@@ -182,6 +199,7 @@ function handleLogin() {
 
     if (user) {
         currentUser = user;
+        localStorage.setItem('8d_current_user', JSON.stringify(user));
         errorMsg.textContent = "";
 
         if (rememberMe) {
@@ -295,6 +313,7 @@ function saveProfileChanges() {
     }
 
     localStorage.setItem('8d_accounts', JSON.stringify(userAccounts));
+    localStorage.setItem('8d_current_user', JSON.stringify(currentUser));
 
     const remembered = JSON.parse(localStorage.getItem('8d_remembered_user'));
     if (remembered) {
@@ -400,7 +419,7 @@ function renderUserAccountsManagement() {
 }
 
 // ====================================================
-// 5. SOHBET (CHAT) SİSTEMİ MANTIĞI & KÜFÜR FİLTRESİ
+// 5. SOHBET (CHAT) SİSTEMİ - ANLIK HERKESE AÇIK
 // ====================================================
 function containsBadWord(text) {
     const cleanText = text.toLowerCase().replace(/[^a-zA-ZçğıöşüÇĞİÖŞÜ0-9\s]/g, "");
@@ -447,8 +466,9 @@ function sendChatMessage() {
     };
 
     chatMessages.push(newMsg);
-    msgInput.value = "";
+    localStorage.setItem('8d_chat_messages', JSON.stringify(chatMessages));
 
+    msgInput.value = "";
     renderChat();
 }
 
@@ -483,6 +503,8 @@ function sendAdminChatMessage() {
     };
 
     chatMessages.push(newMsg);
+    localStorage.setItem('8d_chat_messages', JSON.stringify(chatMessages));
+
     input.value = "";
     renderChat();
 }
@@ -497,6 +519,7 @@ function handleAdminChatEnter(e) {
 
 function deleteChatMessage(id) {
     chatMessages = chatMessages.filter(m => m.id !== id);
+    localStorage.setItem('8d_chat_messages', JSON.stringify(chatMessages));
     renderChat();
 }
 
@@ -576,6 +599,7 @@ function addQuestion() {
     };
 
     questionsList.unshift(newQuestion);
+    localStorage.setItem('8d_questions', JSON.stringify(questionsList));
 
     subjectInput.value = "";
     textInput.value = "";
@@ -586,6 +610,7 @@ function addQuestion() {
 function deleteQuestion(id) {
     if (confirm("Bu soruyu silmek istediğinize emin misiniz?")) {
         questionsList = questionsList.filter(q => q.id !== id);
+        localStorage.setItem('8d_questions', JSON.stringify(questionsList));
         renderQuestions();
     }
 }
@@ -616,6 +641,7 @@ function addAnswer(questionId) {
             avatar: currentUser.avatar || DEFAULT_AVATAR,
             text: text
         });
+        localStorage.setItem('8d_questions', JSON.stringify(questionsList));
         renderQuestions();
     }
 }
@@ -687,6 +713,7 @@ function addAvailability() {
     }
 
     availableUsers.push(name);
+    localStorage.setItem('8d_available_users', JSON.stringify(availableUsers));
     input.value = "";
 
     renderStudentAvailability();
@@ -695,6 +722,7 @@ function addAvailability() {
 
 function removeAvailability(index) {
     availableUsers.splice(index, 1);
+    localStorage.setItem('8d_available_users', JSON.stringify(availableUsers));
     renderStudentAvailability();
     renderAdminAvailability();
 }
@@ -743,6 +771,7 @@ function renderAdminAvailability() {
 function resetAvailabilityList() {
     if (confirm("Müsaitlik listesini tamamen temizlemek istediğinize emin misiniz?")) {
         availableUsers = [];
+        localStorage.setItem('8d_available_users', JSON.stringify(availableUsers));
         renderStudentAvailability();
         renderAdminAvailability();
     }
@@ -939,6 +968,7 @@ function checkPin() {
 
         if (rememberedUser && rememberedUser.role === currentRole) {
             currentUser = rememberedUser;
+            localStorage.setItem('8d_current_user', JSON.stringify(rememberedUser));
             openPortalForUser(rememberedUser);
         } else {
             document.getElementById('pin-screen').classList.remove('active');
@@ -1025,6 +1055,8 @@ function publishAnnouncement() {
         time: timeString
     });
 
+    localStorage.setItem('8d_announcements', JSON.stringify(announcements));
+
     titleInput.value = "";
     textInput.value = "";
 
@@ -1035,6 +1067,7 @@ function publishAnnouncement() {
 function deleteAnnouncement(id) {
     if (confirm("Bu duyuruyu silmek istediğinize emin misiniz?")) {
         announcements = announcements.filter(item => item.id !== id);
+        localStorage.setItem('8d_announcements', JSON.stringify(announcements));
         renderAnnouncements();
     }
 }
@@ -1087,6 +1120,7 @@ function renderAnnouncements() {
 function logout() {
     currentUser = null;
     localStorage.removeItem('8d_remembered_user');
+    localStorage.removeItem('8d_current_user');
     document.querySelectorAll('.portal-screen').forEach(p => p.classList.remove('active'));
     document.getElementById('pin-screen').classList.add('active');
     exitFunMenu();

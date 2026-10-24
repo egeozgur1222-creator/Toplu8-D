@@ -218,7 +218,6 @@ body {
     display: flex;
 }
 
-/* Ortak Kutu Yapısı (Giriş / Kayıt / PIN Ekranı) */
 .welcome-box {
     background: rgba(13, 10, 26, 0.85);
     backdrop-filter: blur(20px);
@@ -996,120 +995,6 @@ body {
 
     .chat-messages-box {
         height: 300px !important;
-    }
-
-    .chat-input-area {
-        flex-direction: column !important;
-        gap: 6px !important;
-    }
-
-    .chat-input-area input, .chat-send-btn {
-        width: 100% !important;
-    }
-}
-/* ====================================================
-   SADECE TELEFONLAR İÇİN MİNİMAL MENÜ VE TAM EKRAN DÜZENİ
-   (Masaüstü Görünümünü Kesinlikle Etkilemez)
-   ==================================================== */
-@media screen and (max-width: 768px) {
-    /* Sadece Portal İçerisindeki Dikey Düzeni Telefona Uyarla */
-    #student-portal.active, #teacher-portal.active {
-        flex-direction: column !important;
-        height: 100vh !important;
-        overflow-y: auto !important;
-    }
-
-    /* Sol Menüyü Üstte İnce Yatay Bir Bara Çevir */
-    #student-portal .sidebar, #teacher-portal .sidebar {
-        width: 100% !important;
-        min-width: 100% !important;
-        max-width: 100% !important;
-        height: auto !important;
-        padding: 8px 10px !important;
-        margin: 0 !important;
-        border-right: none !important;
-        border-bottom: 1px solid rgba(168, 85, 247, 0.4) !important;
-        background: rgba(13, 10, 26, 0.95) !important;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 4px !important;
-        position: sticky !important;
-        top: 0 !important;
-        z-index: 100 !important;
-    }
-
-    .sidebar h2 {
-        font-size: 0.9rem !important;
-        margin-bottom: 2px !important;
-    }
-
-    #user-profile-tag {
-        font-size: 0.7rem !important;
-        margin-bottom: 4px !important;
-    }
-
-    /* Menü Butonlarını Mobilde YAN YANA YATAY KAYDIRILABİLİR YAP */
-    .sidebar ul {
-        display: flex !important;
-        flex-direction: row !important;
-        overflow-x: auto !important;
-        white-space: nowrap !important;
-        gap: 6px !important;
-        padding: 4px 0 !important;
-        margin: 0 !important;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .sidebar li {
-        display: inline-flex !important;
-        align-items: center !important;
-        flex: 0 0 auto !important;
-        padding: 6px 12px !important;
-        font-size: 0.75rem !important;
-        border-radius: 8px !important;
-        margin: 0 !important;
-    }
-
-    /* Mobilde Sol Menüdeki Kalabalık Yapan Alanları Gizle */
-    .announcements-section, .logout-btn {
-        display: none !important;
-    }
-
-    /* Ana İçerik Alanını Devleştir (Mobilde Tam Ekran) */
-    .content-area {
-        width: 100% !important;
-        flex: 1 !important;
-        padding: 12px 8px !important;
-        height: auto !important;
-        overflow: visible !important;
-    }
-
-    .top-profile-bar {
-        margin-bottom: 10px !important;
-    }
-
-    .photo-card {
-        padding: 0.8rem !important;
-        margin-bottom: 1rem !important;
-    }
-
-    /* Tablolar Sağa-Sola Rahatça Kaydırılabilsin */
-    .photo-card table {
-        display: block !important;
-        overflow-x: auto !important;
-        white-space: nowrap !important;
-        width: 100% !important;
-        font-size: 0.75rem !important;
-    }
-
-    /* PIN ve Giriş Ekranı Mobil Boyutu */
-    .welcome-box {
-        width: 90% !important;
-        padding: 1.5rem 1rem !important;
-    }
-
-    .chat-messages-box {
-        height: 320px !important;
     }
 
     .chat-input-area {

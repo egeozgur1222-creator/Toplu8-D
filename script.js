@@ -911,11 +911,11 @@ function animateCat() {
 
 animateCat();
 // ====================================================
-// MOBİL & PC TAM UYUMLU KESİNTİSİZ FLAPPY BIRD ENGINE
+// MOBİL & PC KESİNTİSİZ FLAPPY BIRD ENGINE
 // ====================================================
 let fbCanvas, fbCtx, fbContainer;
-let fbWidth = 320;
-let fbHeight = 480;
+const FB_WIDTH = 320;
+const FB_HEIGHT = 480;
 
 let fbBird = { x: 60, y: 200, radius: 12, gravity: 0.13, lift: -3.9, velocity: 0, rotation: 0 };
 let fbPipes = [];
@@ -925,47 +925,42 @@ let fbGameStarted = false;
 let fbFrame = 0;
 let fbGroundX = 0;
 let fbHitFlash = 0;
-let fbLoopId = null;
+let fbAnimationId = null;
 
 function initFlappyBird() {
     fbCanvas = document.getElementById('flappy-canvas');
     fbContainer = document.getElementById('flappy-container');
     if (!fbCanvas) return;
-    
+
     fbCtx = fbCanvas.getContext('2d');
 
-    // Canvas çözünürlüğünü netleştir
-    fbCanvas.width = fbWidth;
-    fbCanvas.height = fbHeight;
+    // Canvas sabit iç çözünürlüğü
+    fbCanvas.width = FB_WIDTH;
+    fbCanvas.height = FB_HEIGHT;
 
     const highscoreElem = document.getElementById('fb-highscore');
     if (highscoreElem) highscoreElem.textContent = fbHighScore;
 
-    // Dokunma ve Tıklama Eventlerini Bağla
-    fbCanvas.onpointerdown = (e) => {
-        if (e.cancelable) e.preventDefault();
+    // Mobil Dokunmatik & Tıklama Dinleyicileri
+    const handleTouch = (e) => {
+        if (e && e.cancelable) e.preventDefault();
         handleFlappyJump();
     };
 
-    fbCanvas.ontouchstart = (e) => {
-        if (e.cancelable) e.preventDefault();
-        handleFlappyJump();
-    };
+    fbCanvas.onpointerdown = handleTouch;
+    fbCanvas.ontouchstart = handleTouch;
+    fbCanvas.onclick = handleTouch;
 
-    fbCanvas.onclick = (e) => {
-        handleFlappyJump();
-    };
-
-    if (!fbLoopId) {
-        updateFlappyGame();
-    }
+    // Eski döngü varsa temizle, yenisini başlat
+    if (fbAnimationId) cancelAnimationFrame(fbAnimationId);
+    fbAnimationId = requestAnimationFrame(updateFlappyGame);
 }
 
-// Menüden Flappy Bird kategorisine geçildiğinde çalışacak fonksiyon
+// Menüden tıklandığında telefonu uyandıran fonksiyon
 function startFlappyFromMenu() {
     setTimeout(() => {
         initFlappyBird();
-    }, 100);
+    }, 150);
 }
 
 function handleFlappyJump() {
@@ -1009,11 +1004,11 @@ function updateFlappyGame() {
 
     if (!fbGameStarted) {
         drawGetReadyScreen();
-        fbLoopId = requestAnimationFrame(updateFlappyGame);
+        fbAnimationId = requestAnimationFrame(updateFlappyGame);
         return;
     }
 
-    // Fizik
+    // Fizik Güncellemesi
     fbBird.velocity += fbBird.gravity;
     fbBird.y += fbBird.velocity;
 
@@ -1024,12 +1019,14 @@ function updateFlappyGame() {
         if (fbBird.rotation > 45 * Math.PI / 180) fbBird.rotation = 45 * Math.PI / 180;
     }
 
-    const groundY = fbHeight - 60;
+    const groundY = FB_HEIGHT - 60;
 
+    // Yere düşerse baştan doğ
     if (fbBird.y + fbBird.radius >= groundY) {
         dieAndRestart();
     }
 
+    // Tavana çarpmama sınırı
     if (fbBird.y - fbBird.radius <= 0) {
         fbBird.y = fbBird.radius;
         fbBird.velocity = 0;
@@ -1038,6 +1035,7 @@ function updateFlappyGame() {
     fbFrame++;
     fbGroundX = (fbGroundX - 1.2) % 15;
 
+    // Yavaş ve Kolay Boru Üretimi
     if (fbFrame % 125 === 0) {
         let gap = 140;
         let minTop = 40;
@@ -1045,17 +1043,19 @@ function updateFlappyGame() {
         let topHeight = Math.floor(Math.random() * (maxTop - minTop + 1)) + minTop;
 
         fbPipes.push({
-            x: fbWidth,
+            x: FB_WIDTH,
             top: topHeight,
             bottom: groundY - topHeight - gap,
             passed: false
         });
     }
 
+    // Boruları İlerlet
     for (let i = fbPipes.length - 1; i >= 0; i--) {
         let p = fbPipes[i];
         p.x -= 1.2;
 
+        // Çarpışma Kontrolü
         if (
             fbBird.x + fbBird.radius > p.x &&
             fbBird.x - fbBird.radius < p.x + 52 &&
@@ -1065,6 +1065,7 @@ function updateFlappyGame() {
             break;
         }
 
+        // Skor
         if (!p.passed && p.x + 52 < fbBird.x) {
             p.passed = true;
             fbScore++;
@@ -1088,29 +1089,29 @@ function updateFlappyGame() {
 
     if (fbHitFlash > 0) {
         fbCtx.fillStyle = 'rgba(239, 68, 68, 0.4)';
-        fbCtx.fillRect(0, 0, fbWidth, fbHeight);
+        fbCtx.fillRect(0, 0, FB_WIDTH, FB_HEIGHT);
         fbHitFlash--;
     }
 
-    fbLoopId = requestAnimationFrame(updateFlappyGame);
+    fbAnimationId = requestAnimationFrame(updateFlappyGame);
 }
 
 function drawBackground() {
-    let skyGradient = fbCtx.createLinearGradient(0, 0, 0, fbHeight);
+    let skyGradient = fbCtx.createLinearGradient(0, 0, 0, FB_HEIGHT);
     skyGradient.addColorStop(0, '#4ec0ca');
     skyGradient.addColorStop(0.7, '#a2e8dd');
     skyGradient.addColorStop(1, '#ded895');
     fbCtx.fillStyle = skyGradient;
-    fbCtx.fillRect(0, 0, fbWidth, fbHeight);
+    fbCtx.fillRect(0, 0, FB_WIDTH, FB_HEIGHT);
 
     fbCtx.fillStyle = '#83d39a';
-    for (let i = 0; i < fbWidth; i += 40) {
-        fbCtx.fillRect(i, fbHeight - 110, 30, 50);
+    for (let i = 0; i < FB_WIDTH; i += 40) {
+        fbCtx.fillRect(i, FB_HEIGHT - 110, 30, 50);
     }
 }
 
 function drawPipes() {
-    const groundY = fbHeight - 60;
+    const groundY = FB_HEIGHT - 60;
     fbPipes.forEach(p => {
         let pipeGrad = fbCtx.createLinearGradient(p.x, 0, p.x + 52, 0);
         pipeGrad.addColorStop(0, '#73bf2e');
@@ -1136,19 +1137,19 @@ function drawPipes() {
 }
 
 function drawGround() {
-    const groundY = fbHeight - 60;
+    const groundY = FB_HEIGHT - 60;
     fbCtx.fillStyle = '#ded895';
-    fbCtx.fillRect(0, groundY, fbWidth, 60);
+    fbCtx.fillRect(0, groundY, FB_WIDTH, 60);
 
     fbCtx.fillStyle = '#73bf2e';
-    fbCtx.fillRect(0, groundY, fbWidth, 12);
+    fbCtx.fillRect(0, groundY, FB_WIDTH, 12);
 
     fbCtx.strokeStyle = '#ce8e49';
     fbCtx.lineWidth = 2;
     fbCtx.beginPath();
-    for (let x = fbGroundX; x < fbWidth + 20; x += 15) {
+    for (let x = fbGroundX; x < FB_WIDTH + 20; x += 15) {
         fbCtx.moveTo(x, groundY + 16);
-        fbCtx.lineTo(x - 10, fbHeight);
+        fbCtx.lineTo(x - 10, FB_HEIGHT);
     }
     fbCtx.stroke();
 }
@@ -1191,22 +1192,22 @@ function drawBird() {
 
 function drawGetReadyScreen() {
     fbCtx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-    fbCtx.fillRect(0, 0, fbWidth, fbHeight);
+    fbCtx.fillRect(0, 0, FB_WIDTH, FB_HEIGHT);
 
     fbCtx.fillStyle = '#f75302';
     fbCtx.font = '900 22px Orbitron, sans-serif';
     fbCtx.textAlign = 'center';
-    fbCtx.fillText('FLAPPY BIRD', fbWidth / 2, 160);
+    fbCtx.fillText('FLAPPY BIRD', FB_WIDTH / 2, 160);
 
     fbCtx.fillStyle = '#fff';
     fbCtx.font = '600 13px Poppins, sans-serif';
-    fbCtx.fillText('Dokun ve Başla!', fbWidth / 2, 210);
+    fbCtx.fillText('Ekrana Dokun ve Başla!', FB_WIDTH / 2, 210);
 
     drawBird();
     drawGround();
 }
 
-// Klavye Space Tuşu Dinleyici
+// PC Klavye Kontrolü
 window.addEventListener('keydown', (e) => {
     if (e.code === 'Space' || e.code === 'ArrowUp') {
         const flappyTab = document.getElementById('flappy-bird');

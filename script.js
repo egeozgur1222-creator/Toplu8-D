@@ -78,9 +78,9 @@ function runSecurityScanSimulation() {
 // 1. ŞİFRE / PIN AYARLARI
 // ====================================================
 const PINS = {
-    student: "9876",
-    teacher: "1324",
-    fun: "8976"
+    student: "1234",
+    teacher: "9876",
+    fun: "5555"
 };
 
 const DEFAULT_AVATAR = "https://via.placeholder.com/100/9333ea/ffffff?text=8/D";
@@ -814,47 +814,82 @@ function logout() {
 }
 
 // ====================================================
-// 9. HAREKETLİ KEDİ MANTIĞI & PIN EKRANI 3D EĞİLME
+// 9. GİRİŞTE KEDİ & SİTE İÇİNE GİRİNCE MOUSE DUMAN EFEKTİ
 // ====================================================
 let mouseX = window.innerWidth / 2;
 let mouseY = window.innerHeight / 2;
 let catX = window.innerWidth / 2;
 let catY = window.innerHeight / 2;
-let idleTimer = null;
+let sleepTimer = null;
+let isInsidePortal = false;
 
 document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
 
     const cat = document.getElementById('pet-cat');
-    if (cat) {
-        cat.classList.remove('sitting');
-        cat.classList.add('walking');
-    }
 
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(() => {
+    // Sitenin içine girilip girilmediğini kontrol et
+    const studentPortalActive = document.getElementById('student-portal')?.classList.contains('active');
+    const teacherPortalActive = document.getElementById('teacher-portal')?.classList.contains('active');
+
+    isInsidePortal = studentPortalActive || teacherPortalActive;
+
+    if (isInsidePortal) {
+        // İÇERİDEYKEN: Kediyi gizle, duman çıkar
+        if (cat) cat.classList.add('hidden');
+        createSmokeParticle(e.clientX, e.clientY);
+    } else {
+        // DIŞARIDAYKEN (GİRİŞTE): Kediyi göster, duman çıkarma
         if (cat) {
-            cat.classList.remove('walking');
-            cat.classList.add('sitting');
+            cat.classList.remove('hidden');
+            cat.classList.remove('sleeping');
+            cat.classList.add('running');
         }
-    }, 1500);
 
-    const pinScreen = document.getElementById('pin-screen');
-    const card = document.querySelector('.cyber-vault-card');
+        clearTimeout(sleepTimer);
+        sleepTimer = setTimeout(() => {
+            if (cat) {
+                cat.classList.remove('running');
+                cat.classList.add('sleeping');
+            }
+        }, 1200);
 
-    if (pinScreen && pinScreen.classList.contains('active') && card) {
-        const xAxis = (window.innerWidth / 2 - e.clientX) / 25;
-        const yAxis = (window.innerHeight / 2 - e.clientY) / 25;
-
-        card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        // PIN ekranı 3D kart eğilme efekti
+        const pinScreen = document.getElementById('pin-screen');
+        const card = document.querySelector('.cyber-vault-card');
+        if (pinScreen && pinScreen.classList.contains('active') && card) {
+            const xAxis = (window.innerWidth / 2 - e.clientX) / 25;
+            const yAxis = (window.innerHeight / 2 - e.clientY) / 25;
+            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        }
     }
 });
 
+// Duman Parçacığı Oluşturma
+function createSmokeParticle(x, y) {
+    const particle = document.createElement('div');
+    particle.className = 'cursor-particle';
+    
+    const size = Math.random() * 12 + 8;
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+    
+    particle.style.left = `${x}px`;
+    particle.style.top = `${y}px`;
+
+    document.body.appendChild(particle);
+
+    setTimeout(() => {
+        particle.remove();
+    }, 700);
+}
+
+// Kedi Hareket Animasyonu
 function animateCat() {
     const cat = document.getElementById('pet-cat');
     
-    if (cat) {
+    if (cat && !isInsidePortal) {
         const diffX = mouseX - catX;
         const diffY = mouseY - catY;
 
@@ -867,8 +902,8 @@ function animateCat() {
             cat.classList.remove('flip');
         }
 
-        cat.style.left = `${catX + 15}px`;
-        cat.style.top = `${catY + 15}px`;
+        cat.style.left = `${catX + 10}px`;
+        cat.style.top = `${catY + 10}px`;
     }
 
     requestAnimationFrame(animateCat);

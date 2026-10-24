@@ -910,3 +910,300 @@ function animateCat() {
 }
 
 animateCat();
+// ====================================================
+// REAL FLAPPY BIRD ENGINE (ANINDA YENİDEN DOĞMA SÜRÜMÜ)
+// ====================================================
+let fbCanvas, fbCtx;
+let fbContainer;
+let fbWidth = 320;
+let fbHeight = 480;
+
+// Yavaş ve kolay fizik ayarları
+let fbBird = { x: 60, y: 200, radius: 12, gravity: 0.13, lift: -3.9, velocity: 0, rotation: 0 };
+let fbPipes = [];
+let fbScore = 0;
+let fbHighScore = localStorage.getItem('8d_flappy_highscore') || 0;
+let fbGameStarted = false;
+let fbFrame = 0;
+let fbGroundX = 0;
+let fbHitFlash = 0; // Ölünce anlık kırmızı ekran efekti
+
+function initFlappyBird() {
+    fbCanvas = document.getElementById('flappy-canvas');
+    fbContainer = document.getElementById('flappy-container');
+    if (!fbCanvas) return;
+    fbCtx = fbCanvas.getContext('2d');
+
+    fbCanvas.width = fbWidth;
+    fbCanvas.height = fbHeight;
+
+    const highscoreElem = document.getElementById('fb-highscore');
+    if (highscoreElem) highscoreElem.textContent = fbHighScore;
+
+    window.addEventListener('keydown', (e) => {
+        if ((e.code === 'Space' || e.code === 'ArrowUp') && document.getElementById('flappy-bird')?.classList.contains('active')) {
+            e.preventDefault();
+            handleFlappyJump();
+        }
+    });
+
+    fbCanvas.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        handleFlappyJump();
+    });
+
+    fbCanvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        handleFlappyJump();
+    }, { passive: false });
+
+    requestAnimationFrame(updateFlappyGame);
+}
+
+function handleFlappyJump() {
+    if (!fbGameStarted) {
+        fbGameStarted = true;
+        resetFlappyGame();
+    } else {
+        fbBird.velocity = fbBird.lift;
+    }
+}
+
+// ÖLÜNCE ANINDA SIFIRLAYAN FONKSİYON
+function resetFlappyGame() {
+    fbBird.y = 200;
+    fbBird.velocity = 0;
+    fbBird.rotation = 0;
+    fbPipes = [];
+    fbScore = 0;
+    fbFrame = 0;
+    document.getElementById('fb-score').textContent = "0";
+}
+
+function dieAndRestart() {
+    fbHitFlash = 8; // Anlık kırmızı flash patlaması
+    resetFlappyGame(); // Beklemeden direkt baştan doğur
+}
+
+function toggleFlappyFullscreen() {
+    if (!fbContainer) return;
+    if (!document.fullscreenElement) {
+        if (fbContainer.requestFullscreen) fbContainer.requestFullscreen();
+        else if (fbContainer.webkitRequestFullscreen) fbContainer.webkitRequestFullscreen();
+    } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+    }
+}
+
+function updateFlappyGame() {
+    if (!fbCanvas || !fbCtx) return;
+
+    drawBackground();
+
+    if (!fbGameStarted) {
+        drawGetReadyScreen();
+        requestAnimationFrame(updateFlappyGame);
+        return;
+    }
+
+    // Fizik Hareketleri
+    fbBird.velocity += fbBird.gravity;
+    fbBird.y += fbBird.velocity;
+
+    if (fbBird.velocity < 0) {
+        fbBird.rotation = -15 * Math.PI / 180;
+    } else {
+        fbBird.rotation += 2 * Math.PI / 180;
+        if (fbBird.rotation > 45 * Math.PI / 180) fbBird.rotation = 45 * Math.PI / 180;
+    }
+
+    const groundY = fbHeight - 60;
+
+    // 1. YERE DÜŞERSE ÖL VE BAŞTAN DOĞ
+    if (fbBird.y + fbBird.radius >= groundY) {
+        dieAndRestart();
+    }
+
+    // Tavan Çarpmama Sınırı
+    if (fbBird.y - fbBird.radius <= 0) {
+        fbBird.y = fbBird.radius;
+        fbBird.velocity = 0;
+    }
+
+    fbFrame++;
+    fbGroundX = (fbGroundX - 1.2) % 15;
+
+    // Yavaş ve kolay boru üretimi
+    if (fbFrame % 125 === 0) {
+        let gap = 140; // Geniş rahat geçiş aralığı
+        let minTop = 40;
+        let maxTop = groundY - gap - 40;
+        let topHeight = Math.floor(Math.random() * (maxTop - minTop + 1)) + minTop;
+
+        fbPipes.push({
+            x: fbWidth,
+            top: topHeight,
+            bottom: groundY - topHeight - gap,
+            passed: false
+        });
+    }
+
+    // Boruları İlerlet
+    for (let i = fbPipes.length - 1; i >= 0; i--) {
+        let p = fbPipes[i];
+        p.x -= 1.2; // Yavaş akış hızı
+
+        // 2. BORUYA DEĞERSE ÖL VE BAŞTAN DOĞ
+        if (
+            fbBird.x + fbBird.radius > p.x &&
+            fbBird.x - fbBird.radius < p.x + 52 &&
+            (fbBird.y - fbBird.radius < p.top || fbBird.y + fbBird.radius > groundY - p.bottom)
+        ) {
+            dieAndRestart();
+            break; // Döngüyü kes, anında sıfırla
+        }
+
+        // Skor Arttırma
+        if (!p.passed && p.x + 52 < fbBird.x) {
+            p.passed = true;
+            fbScore++;
+            document.getElementById('fb-score').textContent = fbScore;
+
+            if (fbScore > fbHighScore) {
+                fbHighScore = fbScore;
+                localStorage.setItem('8d_flappy_highscore', fbHighScore);
+                document.getElementById('fb-highscore').textContent = fbHighScore;
+            }
+        }
+
+        if (p.x < -60) fbPipes.splice(i, 1);
+    }
+
+    drawPipes();
+    drawGround();
+    drawBird();
+
+    // Ölünce Kırmızı Ekran Flaş Efekti
+    if (fbHitFlash > 0) {
+        fbCtx.fillStyle = 'rgba(239, 68, 68, 0.4)';
+        fbCtx.fillRect(0, 0, fbWidth, fbHeight);
+        fbHitFlash--;
+    }
+
+    requestAnimationFrame(updateFlappyGame);
+}
+
+function drawBackground() {
+    let skyGradient = fbCtx.createLinearGradient(0, 0, 0, fbHeight);
+    skyGradient.addColorStop(0, '#4ec0ca');
+    skyGradient.addColorStop(0.7, '#a2e8dd');
+    skyGradient.addColorStop(1, '#ded895');
+    fbCtx.fillStyle = skyGradient;
+    fbCtx.fillRect(0, 0, fbWidth, fbHeight);
+
+    fbCtx.fillStyle = '#83d39a';
+    for (let i = 0; i < fbWidth; i += 40) {
+        fbCtx.fillRect(i, fbHeight - 110, 30, 50);
+    }
+}
+
+function drawPipes() {
+    const groundY = fbHeight - 60;
+    fbPipes.forEach(p => {
+        let pipeGrad = fbCtx.createLinearGradient(p.x, 0, p.x + 52, 0);
+        pipeGrad.addColorStop(0, '#73bf2e');
+        pipeGrad.addColorStop(0.3, '#9ce659');
+        pipeGrad.addColorStop(0.7, '#73bf2e');
+        pipeGrad.addColorStop(1, '#53801b');
+
+        fbCtx.fillStyle = pipeGrad;
+        fbCtx.strokeStyle = '#2e4c07';
+        fbCtx.lineWidth = 2;
+
+        fbCtx.fillRect(p.x, 0, 52, p.top);
+        fbCtx.strokeRect(p.x, 0, 52, p.top);
+        fbCtx.fillRect(p.x - 3, p.top - 20, 58, 20);
+        fbCtx.strokeRect(p.x - 3, p.top - 20, 58, 20);
+
+        let bottomY = groundY - p.bottom;
+        fbCtx.fillRect(p.x, bottomY, 52, p.bottom);
+        fbCtx.strokeRect(p.x, bottomY, 52, p.bottom);
+        fbCtx.fillRect(p.x - 3, bottomY, 58, 20);
+        fbCtx.strokeRect(p.x - 3, bottomY, 58, 20);
+    });
+}
+
+function drawGround() {
+    const groundY = fbHeight - 60;
+    fbCtx.fillStyle = '#ded895';
+    fbCtx.fillRect(0, groundY, fbWidth, 60);
+
+    fbCtx.fillStyle = '#73bf2e';
+    fbCtx.fillRect(0, groundY, fbWidth, 12);
+
+    fbCtx.strokeStyle = '#ce8e49';
+    fbCtx.lineWidth = 2;
+    fbCtx.beginPath();
+    for (let x = fbGroundX; x < fbWidth + 20; x += 15) {
+        fbCtx.moveTo(x, groundY + 16);
+        fbCtx.lineTo(x - 10, fbHeight);
+    }
+    fbCtx.stroke();
+}
+
+function drawBird() {
+    fbCtx.save();
+    fbCtx.translate(fbBird.x, fbBird.y);
+    fbCtx.rotate(fbBird.rotation);
+
+    fbCtx.fillStyle = '#f7d302';
+    fbCtx.beginPath();
+    fbCtx.arc(0, 0, 14, 0, Math.PI * 2);
+    fbCtx.fill();
+    fbCtx.strokeStyle = '#000';
+    fbCtx.lineWidth = 2;
+    fbCtx.stroke();
+
+    fbCtx.fillStyle = '#fff';
+    fbCtx.beginPath();
+    fbCtx.arc(6, -5, 5, 0, Math.PI * 2);
+    fbCtx.fill();
+    fbCtx.stroke();
+
+    fbCtx.fillStyle = '#000';
+    fbCtx.beginPath();
+    fbCtx.arc(8, -5, 2, 0, Math.PI * 2);
+    fbCtx.fill();
+
+    fbCtx.fillStyle = '#f75302';
+    fbCtx.beginPath();
+    fbCtx.moveTo(8, 2);
+    fbCtx.lineTo(18, 5);
+    fbCtx.lineTo(8, 10);
+    fbCtx.closePath();
+    fbCtx.fill();
+    fbCtx.stroke();
+
+    fbCtx.restore();
+}
+
+function drawGetReadyScreen() {
+    fbCtx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+    fbCtx.fillRect(0, 0, fbWidth, fbHeight);
+
+    fbCtx.fillStyle = '#f75302';
+    fbCtx.font = '900 22px Orbitron, sans-serif';
+    fbCtx.textAlign = 'center';
+    fbCtx.fillText('FLAPPY BIRD', fbWidth / 2, 160);
+
+    fbCtx.fillStyle = '#fff';
+    fbCtx.font = '600 13px Poppins, sans-serif';
+    fbCtx.fillText('Oynamak İçin Tıkla / Space', fbWidth / 2, 210);
+
+    drawBird();
+    drawGround();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    initFlappyBird();
+});

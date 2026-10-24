@@ -200,7 +200,6 @@ function openPortalForUser(user) {
 
     updateUserProfileUI();
 
-    // SADECE Giriş PIN'inde 'Yönetici' seçildiyse Yönetici Paneline yönlendir.
     if (currentRole === 'teacher') {
         document.getElementById('teacher-portal').classList.add('active');
         renderUserAccountsManagement();
@@ -1121,7 +1120,6 @@ document.addEventListener('mousemove', (e) => {
         }
     }, 1500);
 
-    // PIN Ekranı 3D Fare Takip Eğilmesi
     const pinScreen = document.getElementById('pin-screen');
     const card = document.querySelector('.cyber-vault-card');
 

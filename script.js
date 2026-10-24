@@ -78,9 +78,9 @@ function runSecurityScanSimulation() {
 // 1. ŞİFRE / PIN AYARLARI
 // ====================================================
 const PINS = {
-    student: "1234",
-    teacher: "9876",
-    fun: "5555"
+    student: "9876",
+    teacher: "1324",
+    fun: "8976"
 };
 
 const DEFAULT_AVATAR = "https://via.placeholder.com/100/9333ea/ffffff?text=8/D";

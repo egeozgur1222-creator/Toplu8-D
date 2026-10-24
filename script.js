@@ -1,11 +1,7 @@
 // ====================================================
-// 0. FIREBASE CANLI VERİTABANI BAĞLANTISI
+// 0. İLK GİRİŞ TARAMA SİMÜLASYONU VE DİZİLER
 // ====================================================
-const FIREBASE_URL = "https://toplu8d-default-rtdb.firebaseio.com";
-
-let availableUsers = [];
-let questionsList = []; 
-let chatMessages = [];
+let availableUsers = JSON.parse(localStorage.getItem('8d_available_users')) || [];
 let userAccounts = JSON.parse(localStorage.getItem('8d_accounts')) || [];
 let currentUser = JSON.parse(localStorage.getItem('8d_current_user')) || null;
 let tempAvatarBase64 = null;
@@ -15,86 +11,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
     startLGSCountdown();
     startGameCountdown();
-    
-    // Sunucudan (Firebase) Canlı Verileri Dinle ve Getir
-    listenToFirebaseChat();
-    listenToFirebaseQuestions();
-    listenToFirebaseAvailability();
-
+    renderStudentAvailability();
+    renderAdminAvailability();
     renderUserAccountsManagement();
 });
-
-// Firebase'e Veri Gönderme Fonksiyonu (PUT)
-async function sendToFirebase(path, data) {
-    try {
-        await fetch(`${FIREBASE_URL}/${path}.json`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-    } catch (err) {
-        console.error("Firebase veri gönderim hatası:", err);
-    }
-}
-
-// Firebase'den Anlık Sohbet Mesajlarını Dinleme (1.5 saniyede bir günceller)
-function listenToFirebaseChat() {
-    setInterval(async () => {
-        try {
-            const res = await fetch(`${FIREBASE_URL}/chatMessages.json`);
-            const data = await res.json();
-            if (data) {
-                chatMessages = Array.isArray(data) ? data : Object.values(data);
-                renderChat();
-            } else {
-                chatMessages = [];
-                renderChat();
-            }
-        } catch (err) {
-            console.error("Sohbet çekme hatası:", err);
-        }
-    }, 1500);
-}
-
-// Firebase'den Anlık Soruları Dinleme
-function listenToFirebaseQuestions() {
-    setInterval(async () => {
-        try {
-            const res = await fetch(`${FIREBASE_URL}/questions.json`);
-            const data = await res.json();
-            if (data) {
-                questionsList = Array.isArray(data) ? data : Object.values(data);
-                renderQuestions();
-            } else {
-                questionsList = [];
-                renderQuestions();
-            }
-        } catch (err) {
-            console.error("Soru çekme hatası:", err);
-        }
-    }, 2000);
-}
-
-// Firebase'den Müsaitlik Listesini Dinleme
-function listenToFirebaseAvailability() {
-    setInterval(async () => {
-        try {
-            const res = await fetch(`${FIREBASE_URL}/availableUsers.json`);
-            const data = await res.json();
-            if (data) {
-                availableUsers = Array.isArray(data) ? data : Object.values(data);
-                renderStudentAvailability();
-                renderAdminAvailability();
-            } else {
-                availableUsers = [];
-                renderStudentAvailability();
-                renderAdminAvailability();
-            }
-        } catch (err) {
-            console.error("Müsaitlik çekme hatası:", err);
-        }
-    }, 2000);
-}
 
 function runSecurityScanSimulation() {
     const statusText = document.getElementById('scan-status-text');
@@ -164,12 +84,6 @@ const PINS = {
 };
 
 const DEFAULT_AVATAR = "https://via.placeholder.com/100/9333ea/ffffff?text=8/D";
-
-const BAD_WORDS = [
-    "amk", "aq", "sg", "oç", "oc", "pic", "piç", "yarrak", "yarak",
-    "amq", "sik", "sikiş", "sikim", "orospu", "kahpe", "göt", "got",
-    "yarram", "yarragim", "amcık", "amcik", "fuck", "bitch", "porno"
-];
 
 let currentRole = 'student';
 let enteredPin = "";
@@ -282,11 +196,6 @@ function openPortalForUser(user) {
         renderUserAccountsManagement();
     } else {
         document.getElementById('student-portal').classList.add('active');
-        
-        const chatAuthor = document.getElementById('chat-author-input');
-        const askerAuthor = document.getElementById('asker-name-input');
-        if (chatAuthor) chatAuthor.value = user.username;
-        if (askerAuthor) askerAuthor.value = user.username;
     }
 }
 
@@ -432,12 +341,11 @@ function toggleUserRole(username) {
         alert(`👤 ${user.username} adlı kullanıcının yetkisi 'Öğrenci' olarak değiştirildi.`);
     } else {
         user.role = 'teacher';
-        alert(`👑 ${user.username} adlı kullanıcıya Yönetici yetkisi verildi! Artık öğrenci paneli sohbetinde '👑 YÖNETİCİ' etiketi görünecektir.`);
+        alert(`👑 ${user.username} adlı kullanıcıya Yönetici yetkisi verildi!`);
     }
 
     localStorage.setItem('8d_accounts', JSON.stringify(userAccounts));
     renderUserAccountsManagement();
-    renderChat();
     updateUserProfileUI();
 }
 
@@ -478,287 +386,7 @@ function renderUserAccountsManagement() {
 }
 
 // ====================================================
-// 5. SOHBET (CHAT) SİSTEMİ - FIREBASE CANLI MESAJLAŞMA
-// ====================================================
-function containsBadWord(text) {
-    const cleanText = text.toLowerCase().replace(/[^a-zA-ZçğıöşüÇĞİÖŞÜ0-9\s]/g, "");
-    const words = cleanText.split(/\s+/);
-
-    return BAD_WORDS.some(bad => {
-        return words.includes(bad) || cleanText.includes(bad);
-    });
-}
-
-function sendChatMessage() {
-    const msgInput = document.getElementById('chat-message-input');
-    const text = msgInput.value.trim();
-
-    if (!currentUser) {
-        alert("Mesaj atmak için giriş yapmalısınız!");
-        return;
-    }
-
-    if (!text) {
-        alert("Lütfen bir mesaj yazın!");
-        return;
-    }
-
-    if (containsBadWord(text)) {
-        alert("⚠️ Yasaklı kelime kullandın lütfen kullanma devam edersen yönetici Ege tarafından banlanıcaksın");
-        msgInput.value = "";
-        return;
-    }
-
-    const now = new Date();
-    const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-    const updatedUserAcc = userAccounts.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
-    const isUserAdmin = (updatedUserAcc && updatedUserAcc.role === 'teacher') || currentUser.role === 'teacher';
-
-    const newMsg = {
-        id: Date.now(),
-        author: currentUser.username,
-        avatar: currentUser.avatar || DEFAULT_AVATAR,
-        text: text,
-        time: time,
-        isAdmin: isUserAdmin
-    };
-
-    chatMessages.push(newMsg);
-    sendToFirebase('chatMessages', chatMessages);
-
-    msgInput.value = "";
-    renderChat();
-}
-
-function sendAdminChatMessage() {
-    const input = document.getElementById('admin-chat-message-input');
-    if (!input) return;
-
-    const text = input.value.trim();
-    if (!text) return;
-
-    if (!currentUser) {
-        alert("Mesaj atmak için giriş yapmalısınız!");
-        return;
-    }
-
-    if (containsBadWord(text)) {
-        alert("⚠️ Yasaklı kelime kullandınız!");
-        input.value = "";
-        return;
-    }
-
-    const now = new Date();
-    const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-    const newMsg = {
-        id: Date.now(),
-        author: currentUser.username,
-        avatar: currentUser.avatar || DEFAULT_AVATAR,
-        text: text,
-        time: time,
-        isAdmin: true
-    };
-
-    chatMessages.push(newMsg);
-    sendToFirebase('chatMessages', chatMessages);
-
-    input.value = "";
-    renderChat();
-}
-
-function handleChatEnter(e) {
-    if (e.key === 'Enter') sendChatMessage();
-}
-
-function handleAdminChatEnter(e) {
-    if (e.key === 'Enter') sendAdminChatMessage();
-}
-
-function deleteChatMessage(id) {
-    chatMessages = chatMessages.filter(m => m.id !== id);
-    sendToFirebase('chatMessages', chatMessages);
-    renderChat();
-}
-
-function renderChat() {
-    const boxes = document.querySelectorAll('.chat-messages-box');
-    if (!boxes || boxes.length === 0) return;
-
-    let html = "";
-
-    if (chatMessages.length === 0) {
-        html = '<p style="color: #64748b; font-size: 0.9rem; text-align: center; margin-top: 20px;">Henüz hiç mesaj yazılmadı. İlk mesajı sen at! 🔥</p>';
-    } else {
-        chatMessages.forEach(m => {
-            const acc = userAccounts.find(u => u.username.toLowerCase() === m.author.toLowerCase());
-            const showAdminBadge = m.isAdmin || (acc && acc.role === 'teacher');
-
-            const adminBadgeHtml = showAdminBadge ? `<span class="admin-chat-badge">👑 YÖNETİCİ</span>` : '';
-            const avatarAdminClass = showAdminBadge ? 'admin-avatar' : '';
-
-            html += `
-                <div class="chat-bubble ${showAdminBadge ? 'admin-bubble' : ''}">
-                    <div class="chat-bubble-header">
-                        <div class="chat-user-info" onclick="viewUserProfile('${m.author}')">
-                            <img src="${m.avatar}" class="chat-avatar-mini ${avatarAdminClass}" alt="${m.author}">
-                            <span class="chat-author">${m.author}</span>
-                            ${adminBadgeHtml}
-                        </div>
-                        <div>
-                            <span class="chat-time">${m.time}</span>
-                            <button type="button" class="chat-delete-btn" onclick="deleteChatMessage(${m.id})">❌</button>
-                        </div>
-                    </div>
-                    <div class="chat-text">${m.text}</div>
-                </div>
-            `;
-        });
-    }
-
-    boxes.forEach(box => {
-        box.innerHTML = html;
-        box.scrollTop = box.scrollHeight;
-    });
-}
-
-// ====================================================
-// 6. SORU-CEVAP SİSTEMİ MANTIĞI
-// ====================================================
-function addQuestion() {
-    const subjectInput = document.getElementById('question-subject-input');
-    const textInput = document.getElementById('question-text-input');
-
-    const subject = subjectInput.value.trim();
-    const text = textInput.value.trim();
-
-    if (!currentUser) {
-        alert("Soru sormak için giriş yapmalısınız!");
-        return;
-    }
-
-    if (!subject || !text) {
-        alert("Lütfen ders konusunu ve sorunuzu eksiksiz doldurun!");
-        return;
-    }
-
-    if (containsBadWord(text) || containsBadWord(subject)) {
-        alert("⚠️ Yasaklı kelime kullandın lütfen kullanma devam edersen yönetici Ege tarafından banlanıcaksın");
-        return;
-    }
-
-    const newQuestion = {
-        id: Date.now(),
-        author: currentUser.username,
-        avatar: currentUser.avatar || DEFAULT_AVATAR,
-        subject: subject,
-        text: text,
-        answers: []
-    };
-
-    questionsList.unshift(newQuestion);
-    sendToFirebase('questions', questionsList);
-
-    subjectInput.value = "";
-    textInput.value = "";
-
-    renderQuestions();
-}
-
-function deleteQuestion(id) {
-    if (confirm("Bu soruyu silmek istediğinize emin misiniz?")) {
-        questionsList = questionsList.filter(q => q.id !== id);
-        sendToFirebase('questions', questionsList);
-        renderQuestions();
-    }
-}
-
-function addAnswer(questionId) {
-    const textInput = document.getElementById(`ans-text-${questionId}`);
-    const text = textInput.value.trim();
-
-    if (!currentUser) {
-        alert("Cevap vermek için giriş yapmalısınız!");
-        return;
-    }
-
-    if (!text) {
-        alert("Lütfen cevabınızı doldurun!");
-        return;
-    }
-
-    if (containsBadWord(text)) {
-        alert("⚠️ Yasaklı kelime kullandın lütfen kullanma devam edersen yönetici Ege tarafından banlanıcaksın");
-        return;
-    }
-
-    const question = questionsList.find(q => q.id === questionId);
-    if (question) {
-        if (!question.answers) question.answers = [];
-        question.answers.push({
-            author: currentUser.username,
-            avatar: currentUser.avatar || DEFAULT_AVATAR,
-            text: text
-        });
-        sendToFirebase('questions', questionsList);
-        renderQuestions();
-    }
-}
-
-function renderQuestions() {
-    const container = document.getElementById('questions-container');
-    if (!container) return;
-
-    if (questionsList.length === 0) {
-        container.innerHTML = '<p style="color: #64748b; font-size: 0.95rem; text-align: center;">Henüz hiç soru sorulmadı. İlk soruyu sen sor!</p>';
-        return;
-    }
-
-    let html = "";
-    questionsList.forEach(q => {
-        let answersHtml = "";
-        if (q.answers) {
-            q.answers.forEach(a => {
-                answersHtml += `
-                    <div class="answer-item">
-                        <span class="answer-author clickable-profile" onclick="viewUserProfile('${a.author}')">💬 ${a.author}:</span>
-                        <span>${a.text}</span>
-                    </div>
-                `;
-            });
-        }
-
-        html += `
-            <div class="question-card">
-                <div class="question-header">
-                    <div>
-                        <span class="question-author clickable-profile" onclick="viewUserProfile('${q.author}')">
-                            <img src="${q.avatar}" class="chat-avatar-mini" style="vertical-align: middle; margin-right: 5px;"> ${q.author} sordu:
-                        </span>
-                        <span class="question-subject" style="margin-left: 10px;">📚 ${q.subject}</span>
-                    </div>
-                    <button type="button" class="delete-q-btn" onclick="deleteQuestion(${q.id})">🗑️ Soruyu Sil</button>
-                </div>
-                <div class="question-body">${q.text}</div>
-
-                <div class="answers-list">
-                    ${answersHtml}
-                </div>
-
-                <div class="answer-input-box">
-                    <input type="text" id="ans-text-${q.id}" placeholder="Cevabınızı / Çözümünüzü yazın..." style="flex: 1;">
-                    <button type="button" class="answer-btn" onclick="addAnswer(${q.id})">Cevapla</button>
-                </div>
-            </div>
-        `;
-    });
-
-    container.innerHTML = html;
-}
-
-// ====================================================
-// 7. MÜSAİTLİK SİSTEMİ MANTIĞI
+// 5. MÜSAİTLİK SİSTEMİ MANTIĞI
 // ====================================================
 function addAvailability() {
     const input = document.getElementById('student-name-input');
@@ -775,7 +403,7 @@ function addAvailability() {
     }
 
     availableUsers.push(name);
-    sendToFirebase('availableUsers', availableUsers);
+    localStorage.setItem('8d_available_users', JSON.stringify(availableUsers));
     input.value = "";
 
     renderStudentAvailability();
@@ -784,7 +412,7 @@ function addAvailability() {
 
 function removeAvailability(index) {
     availableUsers.splice(index, 1);
-    sendToFirebase('availableUsers', availableUsers);
+    localStorage.setItem('8d_available_users', JSON.stringify(availableUsers));
     renderStudentAvailability();
     renderAdminAvailability();
 }
@@ -833,14 +461,14 @@ function renderAdminAvailability() {
 function resetAvailabilityList() {
     if (confirm("Müsaitlik listesini tamamen temizlemek istediğinize emin misiniz?")) {
         availableUsers = [];
-        sendToFirebase('availableUsers', availableUsers);
+        localStorage.setItem('8d_available_users', JSON.stringify(availableUsers));
         renderStudentAvailability();
         renderAdminAvailability();
     }
 }
 
 // ====================================================
-// 8. GERİ SAYIM SAYAÇLARI
+// 6. GERİ SAYIM SAYAÇLARI
 // ====================================================
 function startLGSCountdown() {
     const lgsDate = new Date("June 6, 2027 09:30:00").getTime();
@@ -904,7 +532,7 @@ function startGameCountdown() {
 }
 
 // ====================================================
-// 9. EĞLENCE PIN SİSTEMİ MANTIĞI
+// 7. EĞLENCE PIN SİSTEMİ MANTIĞI
 // ====================================================
 function openFunModal() {
     enteredFunPin = "";
@@ -976,7 +604,7 @@ function exitFunMenu() {
 }
 
 // ====================================================
-// 10. GENEL ANA PIN KONTROLLERİ
+// 8. GENEL ANA PIN KONTROLLERİ
 // ====================================================
 function selectRole(role) {
     if (isLocked) return;
@@ -1089,10 +717,6 @@ function switchTeacherCategory(categoryId, element) {
 
     document.querySelectorAll('#teacher-portal .sidebar li').forEach(li => li.classList.remove('active'));
     if (element) element.classList.add('active');
-
-    if (categoryId === 't-fun-area') {
-        renderChat();
-    }
 }
 
 function publishAnnouncement() {
@@ -1190,7 +814,7 @@ function logout() {
 }
 
 // ====================================================
-// 11. HAREKETLİ KEDİ MANTIĞI & PIN EKRANI 3D EĞİLME
+// 9. HAREKETLİ KEDİ MANTIĞI & PIN EKRANI 3D EĞİLME
 // ====================================================
 let mouseX = window.innerWidth / 2;
 let mouseY = window.innerHeight / 2;

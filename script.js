@@ -911,10 +911,9 @@ function animateCat() {
 
 animateCat();
 // ====================================================
-// MOBİL & PC UYUMLU FLAPPY BIRD ENGINE
+// MOBİL & PC TAM UYUMLU KESİNTİSİZ FLAPPY BIRD ENGINE
 // ====================================================
-let fbCanvas, fbCtx;
-let fbContainer;
+let fbCanvas, fbCtx, fbContainer;
 let fbWidth = 320;
 let fbHeight = 480;
 
@@ -926,42 +925,47 @@ let fbGameStarted = false;
 let fbFrame = 0;
 let fbGroundX = 0;
 let fbHitFlash = 0;
+let fbLoopId = null;
 
 function initFlappyBird() {
     fbCanvas = document.getElementById('flappy-canvas');
     fbContainer = document.getElementById('flappy-container');
     if (!fbCanvas) return;
+    
     fbCtx = fbCanvas.getContext('2d');
 
+    // Canvas çözünürlüğünü netleştir
     fbCanvas.width = fbWidth;
     fbCanvas.height = fbHeight;
 
     const highscoreElem = document.getElementById('fb-highscore');
     if (highscoreElem) highscoreElem.textContent = fbHighScore;
 
-    // --- MOBİL DOKUNMATİK & KLAVYE ETKİLEŞİM DÜZENLEMESİ ---
-    const triggerJump = (e) => {
-        // Dokunmatik ekranda sayfanın aşağı kaymasını engelle
-        if (e.type === 'touchstart' || e.type === 'pointerdown') {
-            if (e.cancelable) e.preventDefault();
-        }
+    // Dokunma ve Tıklama Eventlerini Bağla
+    fbCanvas.onpointerdown = (e) => {
+        if (e.cancelable) e.preventDefault();
         handleFlappyJump();
     };
 
-    // Klavye (Space ve Yukarı Ok)
-    window.addEventListener('keydown', (e) => {
-        if ((e.code === 'Space' || e.code === 'ArrowUp') && document.getElementById('flappy-bird')?.classList.contains('active')) {
-            e.preventDefault();
-            handleFlappyJump();
-        }
-    });
+    fbCanvas.ontouchstart = (e) => {
+        if (e.cancelable) e.preventDefault();
+        handleFlappyJump();
+    };
 
-    // Mobil Dokunmatik & Fare Tıklaması
-    fbCanvas.addEventListener('touchstart', triggerJump, { passive: false });
-    fbCanvas.addEventListener('pointerdown', triggerJump);
-    fbCanvas.addEventListener('mousedown', triggerJump);
+    fbCanvas.onclick = (e) => {
+        handleFlappyJump();
+    };
 
-    requestAnimationFrame(updateFlappyGame);
+    if (!fbLoopId) {
+        updateFlappyGame();
+    }
+}
+
+// Menüden Flappy Bird kategorisine geçildiğinde çalışacak fonksiyon
+function startFlappyFromMenu() {
+    setTimeout(() => {
+        initFlappyBird();
+    }, 100);
 }
 
 function handleFlappyJump() {
@@ -979,7 +983,8 @@ function resetFlappyGame() {
     fbPipes = [];
     fbScore = 0;
     fbFrame = 0;
-    document.getElementById('fb-score').textContent = "0";
+    const scoreElem = document.getElementById('fb-score');
+    if (scoreElem) scoreElem.textContent = "0";
 }
 
 function dieAndRestart() {
@@ -1004,7 +1009,7 @@ function updateFlappyGame() {
 
     if (!fbGameStarted) {
         drawGetReadyScreen();
-        requestAnimationFrame(updateFlappyGame);
+        fbLoopId = requestAnimationFrame(updateFlappyGame);
         return;
     }
 
@@ -1021,12 +1026,10 @@ function updateFlappyGame() {
 
     const groundY = fbHeight - 60;
 
-    // Yere düşme kontrolü
     if (fbBird.y + fbBird.radius >= groundY) {
         dieAndRestart();
     }
 
-    // Tavana çarpma kontrolü
     if (fbBird.y - fbBird.radius <= 0) {
         fbBird.y = fbBird.radius;
         fbBird.velocity = 0;
@@ -1035,7 +1038,6 @@ function updateFlappyGame() {
     fbFrame++;
     fbGroundX = (fbGroundX - 1.2) % 15;
 
-    // Boru Üretimi
     if (fbFrame % 125 === 0) {
         let gap = 140;
         let minTop = 40;
@@ -1050,12 +1052,10 @@ function updateFlappyGame() {
         });
     }
 
-    // Boru Hareketleri
     for (let i = fbPipes.length - 1; i >= 0; i--) {
         let p = fbPipes[i];
         p.x -= 1.2;
 
-        // Çarpışma Kontrolü
         if (
             fbBird.x + fbBird.radius > p.x &&
             fbBird.x - fbBird.radius < p.x + 52 &&
@@ -1065,16 +1065,17 @@ function updateFlappyGame() {
             break;
         }
 
-        // Skor
         if (!p.passed && p.x + 52 < fbBird.x) {
             p.passed = true;
             fbScore++;
-            document.getElementById('fb-score').textContent = fbScore;
+            const scoreElem = document.getElementById('fb-score');
+            if (scoreElem) scoreElem.textContent = fbScore;
 
             if (fbScore > fbHighScore) {
                 fbHighScore = fbScore;
                 localStorage.setItem('8d_flappy_highscore', fbHighScore);
-                document.getElementById('fb-highscore').textContent = fbHighScore;
+                const highscoreElem = document.getElementById('fb-highscore');
+                if (highscoreElem) highscoreElem.textContent = fbHighScore;
             }
         }
 
@@ -1091,7 +1092,7 @@ function updateFlappyGame() {
         fbHitFlash--;
     }
 
-    requestAnimationFrame(updateFlappyGame);
+    fbLoopId = requestAnimationFrame(updateFlappyGame);
 }
 
 function drawBackground() {
@@ -1199,11 +1200,22 @@ function drawGetReadyScreen() {
 
     fbCtx.fillStyle = '#fff';
     fbCtx.font = '600 13px Poppins, sans-serif';
-    fbCtx.fillText('Oynamak İçin Ekrana Dokun', fbWidth / 2, 210);
+    fbCtx.fillText('Dokun ve Başla!', fbWidth / 2, 210);
 
     drawBird();
     drawGround();
 }
+
+// Klavye Space Tuşu Dinleyici
+window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' || e.code === 'ArrowUp') {
+        const flappyTab = document.getElementById('flappy-bird');
+        if (flappyTab && flappyTab.classList.contains('active')) {
+            e.preventDefault();
+            handleFlappyJump();
+        }
+    }
+});
 
 window.addEventListener('DOMContentLoaded', () => {
     initFlappyBird();

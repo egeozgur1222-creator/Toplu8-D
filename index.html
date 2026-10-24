@@ -96,7 +96,7 @@
     </div>
 
     <!-- 1.5 KULLANICI ADI & ŞİFRE (GİRİŞ / KAYIT) EKRANI -->
-    <div id="auth-screen" class="portal-screen">
+    <div id="auth-screen">
         <div class="welcome-box" style="max-width: 450px;">
             <h2 class="welcome-text" style="font-size: 2rem;">👤 HESAP ERİŞİMİ</h2>
             <p class="subtitle">Devam etmek için giriş yapın veya kayıt olun</p>
@@ -220,8 +220,8 @@
                     <li onclick="switchCategory('sinavlar', this)">3. Sınıf Sınavları</li>
                     <li onclick="switchCategory('denemeler', this)">4. Denemeler</li>
                     <li onclick="switchCategory('yayinlar', this)">5. Deneme Yayınları</li>
-                    <li onclick="switchCategory('soru-sor', this)" style="background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; font-weight: bold; margin-top: 5px;">❓ 6. Soru Sor / Cevapla</li>
-                    <li onclick="openFunModal()" style="background: rgba(232, 121, 249, 0.15); border: 1px solid #e879f9; color: #e879f9; font-weight: bold; margin-top: 5px;">🎉 7. Eğlence</li>
+                    <li onclick="switchCategory('soru-sor', this)" style="background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; font-weight: bold;">❓ 6. Soru Sor / Cevapla</li>
+                    <li onclick="openFunModal()" style="background: rgba(232, 121, 249, 0.15); border: 1px solid #e879f9; color: #e879f9; font-weight: bold;">🎉 7. Eğlence</li>
                 </ul>
             </div>
 
@@ -231,10 +231,10 @@
                     <li class="active" onclick="switchCategory('oyunlar', this)">1. 🎮 Oyunlar</li>
                     <li onclick="switchCategory('oyun-zamani', this)">2. ⏰ Oyun Zamanı</li>
                     <li onclick="switchCategory('musaitlik', this)">3. 🟢 Müsaitlik</li>
-                    <li onclick="switchCategory('sohbet', this)" style="background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #e879f9; font-weight: bold; margin-top: 5px;">💬 4. Sohbet</li>
-                    <li onclick="switchCategory('gruplar', this)" style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #4ade80; font-weight: bold; margin-top: 5px;">👥 5. Gruplar</li>
+                    <li onclick="switchCategory('sohbet', this)" style="background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #e879f9; font-weight: bold;">💬 4. Sohbet</li>
+                    <li onclick="switchCategory('gruplar', this)" style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #4ade80; font-weight: bold;">👥 5. Gruplar</li>
+                    <li onclick="exitFunMenu()" style="background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #38bdf8; font-weight: bold;">🔙 Sınıf Portalına Dön</li>
                 </ul>
-                <button type="button" onclick="exitFunMenu()" style="width: 100%; margin-top: 15px; padding: 10px; background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #38bdf8; border-radius: 10px; cursor: pointer; font-weight: 600;">🔙 Sınıf Portalına Dön</button>
             </div>
 
             <div class="announcements-section">
@@ -573,9 +573,9 @@
                 <li onclick="switchTeacherCategory('t-ornek-sinavlar', this)">3. Sınav Yönetimi</li>
                 <li onclick="switchTeacherCategory('t-yayinlar', this)">4. Deneme Yayınları Yönetimi</li>
                 <li onclick="switchTeacherCategory('t-duyuru-ekle', this)">5. Duyuru & İçerik Yönetimi</li>
-                <li onclick="switchTeacherCategory('t-musaitlik-takip', this)" style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #4ade80; font-weight: bold; margin-top: 10px;">🟢 6. Müsaitlik Takibi</li>
-                <li onclick="switchTeacherCategory('t-user-management', this)" style="background: rgba(232, 121, 249, 0.15); border: 1px solid #e879f9; color: #e879f9; font-weight: bold; margin-top: 5px;">👥 7. Hesaplar & Yetki Yönetimi</li>
-                <li onclick="switchTeacherCategory('t-fun-area', this)" style="background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; font-weight: bold; margin-top: 5px;">🎉 8. Eğlence Alanı</li>
+                <li onclick="switchTeacherCategory('t-musaitlik-takip', this)" style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #4ade80; font-weight: bold;">🟢 6. Müsaitlik Takibi</li>
+                <li onclick="switchTeacherCategory('t-user-management', this)" style="background: rgba(232, 121, 249, 0.15); border: 1px solid #e879f9; color: #e879f9; font-weight: bold;">👥 7. Hesaplar & Yetki Yönetimi</li>
+                <li onclick="switchTeacherCategory('t-fun-area', this)" style="background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; font-weight: bold;">🎉 8. Eğlence Alanı</li>
             </ul>
 
             <div class="announcements-section">

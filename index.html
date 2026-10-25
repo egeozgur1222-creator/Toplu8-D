@@ -12,7 +12,7 @@
     <!-- Arka Plan Neon Efekti -->
     <div class="bg-glow"></div>
 
-    <!-- 0. SİBERPUNK İNTRO VE GÖSTERMELİK TARAMA EKRANI -->
+    <!-- 0. İNTRO VE TARAMA EKRANI -->
     <div id="welcome-intro-screen" class="intro-screen active">
         <div class="cyber-overlay"></div>
         <div class="cyber-grid"></div>
@@ -43,7 +43,7 @@
         </div>
     </div>
 
-    <!-- 1. ULTRA HAVALI SİBERPUNK PIN EKRANI -->
+    <!-- 1. PIN EKRANI -->
     <div id="pin-screen">
         <div class="cyber-hex-grid"></div>
         <div class="cyber-scanline"></div>
@@ -223,12 +223,13 @@
                 </ul>
             </div>
 
+            <!-- DÜZELTİLMİŞ EĞLENCE MENÜSÜ -->
             <div id="fun-student-menu" style="display: none;">
                 <h2 style="color: #38bdf8;">🎉 Eğlence Menüsü</h2>
-                <ul>
+                <ul style="display: flex; flex-direction: column; gap: 8px; padding: 0; list-style: none;">
                     <li class="active" onclick="switchCategory('oyunlar', this)">1. 🎮 Favori Oyunlar</li>
-                    <li onclick="switchCategory('flappy-bird', this); startFlappyFromMenu();" style="background: rgba(250, 204, 21, 0.15); border: 1px solid #facc15; color: #facc15; font-weight: bold;">2. 🐤 Flappy Bird</li>
-                    <li onclick="switchCategory('snake-game', this); startSnakeFromMenu();" style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #4ade80; font-weight: bold;">3. 🐍 Solucan Oyunu</li>
+                    <li onclick="switchCategory('flappy-bird', this); startFlappyFromMenu();" style="background: rgba(250, 204, 21, 0.15); border: 1px solid #facc15; color: #facc15; font-weight: bold; display: block !important;">2. 🐤 Flappy Bird</li>
+                    <li onclick="switchCategory('snake-game', this); startSnakeFromMenu();" style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #4ade80; font-weight: bold; display: block !important;">3. 🐍 Solucan Oyunu</li>
                     <li onclick="switchCategory('oyun-zamani', this)">4. ⏰ Oyun Zamanı</li>
                     <li onclick="switchCategory('musaitlik', this)">5. 🟢 Müsaitlik</li>
                     <li onclick="switchCategory('gruplar', this)" style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #4ade80; font-weight: bold;">👥 6. Gruplar</li>
@@ -484,7 +485,7 @@
                 </div>
             </section>
 
-            <!-- FLAPPY BIRD SEKSİYONU -->
+            <!-- FLAPPY BIRD EKRANI -->
             <section id="flappy-bird" class="category-content">
                 <h3>🐤 Cyber Flappy Bird</h3>
                 <p style="color: #a78bfa; margin-bottom: 1rem;">Mobil & PC Uyumlu Orijinal Oyun</p>
@@ -505,7 +506,7 @@
                 </div>
             </section>
 
-            <!-- YENİ: 🐍 SOLUCAN OYUNU SEKSİYONU -->
+            <!-- SOLUCAN OYUNU EKRANI -->
             <section id="snake-game" class="category-content">
                 <h3>🐍 Siber Solucan Oyunu</h3>
                 <p style="color: #a78bfa; margin-bottom: 1rem;">PC & Mobil Uyumlu Klasik Solucan Oyunu</p>
@@ -516,7 +517,7 @@
                         <canvas id="snake-canvas" width="320" height="320" style="width: 320px; height: 320px; display: block; background: #050b14;"></canvas>
                     </div>
 
-                    <!-- MOBİL İÇİN D-PAD / DOKUNMATİK YÖN BUTONLARI -->
+                    <!-- MOBİL İÇİN D-PAD YÖN BUTONLARI -->
                     <div class="snake-controls" style="margin-top: 15px; display: flex; flex-direction: column; align-items: center; gap: 6px;">
                         <button type="button" onclick="setSnakeDir('UP')" style="padding: 10px 20px; background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; color: #4ade80; border-radius: 8px; font-weight: bold; font-size: 1.2rem; cursor: pointer;">▲</button>
                         <div style="display: flex; gap: 20px;">
@@ -578,7 +579,7 @@
         </main>
     </div>
 
-    <!-- 3. YÖNETİCİ PANELİ (ADMIN PORTAL) -->
+    <!-- 3. YÖNETİCİ PANELİ -->
     <div id="teacher-portal" class="portal-screen">
         <aside class="sidebar teacher-sidebar">
             <h2>🛠️ Yönetici Paneli</h2>

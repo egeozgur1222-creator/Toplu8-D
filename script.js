@@ -1221,3 +1221,126 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('DOMContentLoaded', () => {
     initFlappyBird();
 });
+// ====================================================
+// SOLUCAN OYUNU MOTORU (SNAKE GAME ENGINE)
+// ====================================================
+let snakeCanvas, snakeCtx;
+const SNAKE_GRID = 16;
+let snake = [{x: 160, y: 160}, {x: 144, y: 160}, {x: 128, y: 160}];
+let snakeDir = 'RIGHT';
+let nextSnakeDir = 'RIGHT';
+let snakeFood = {x: 0, y: 0};
+let snakeScore = 0;
+let snakeHighScore = localStorage.getItem('8d_snake_highscore') || 0;
+let snakeInterval = null;
+
+function initSnakeGame() {
+    snakeCanvas = document.getElementById('snake-canvas');
+    if (!snakeCanvas) return;
+    snakeCtx = snakeCanvas.getContext('2d');
+
+    const highscoreElem = document.getElementById('snake-highscore');
+    if (highscoreElem) highscoreElem.textContent = snakeHighScore;
+
+    spawnSnakeFood();
+
+    if (snakeInterval) clearInterval(snakeInterval);
+    snakeInterval = setInterval(updateSnakeGame, 100);
+}
+
+function startSnakeFromMenu() {
+    setTimeout(() => {
+        initSnakeGame();
+    }, 150);
+}
+
+function setSnakeDir(dir) {
+    if (dir === 'UP' && snakeDir !== 'DOWN') nextSnakeDir = 'UP';
+    if (dir === 'DOWN' && snakeDir !== 'UP') nextSnakeDir = 'DOWN';
+    if (dir === 'LEFT' && snakeDir !== 'RIGHT') nextSnakeDir = 'LEFT';
+    if (dir === 'RIGHT' && snakeDir !== 'LEFT') nextSnakeDir = 'RIGHT';
+}
+
+function spawnSnakeFood() {
+    snakeFood = {
+        x: Math.floor(Math.random() * (320 / SNAKE_GRID)) * SNAKE_GRID,
+        y: Math.floor(Math.random() * (320 / SNAKE_GRID)) * SNAKE_GRID
+    };
+}
+
+function updateSnakeGame() {
+    if (!snakeCtx) return;
+
+    snakeDir = nextSnakeDir;
+    let head = {x: snake[0].x, y: snake[0].y};
+
+    if (snakeDir === 'UP') head.y -= SNAKE_GRID;
+    if (snakeDir === 'DOWN') head.y += SNAKE_GRID;
+    if (snakeDir === 'LEFT') head.x -= SNAKE_GRID;
+    if (snakeDir === 'RIGHT') head.x += SNAKE_GRID;
+
+    // Duvara veya kendi üstüne çarparsa baştan doğ
+    if (
+        head.x < 0 || head.x >= 320 || head.y < 0 || head.y >= 320 ||
+        snake.some(segment => segment.x === head.x && segment.y === head.y)
+    ) {
+        resetSnakeGame();
+        return;
+    }
+
+    snake.unshift(head);
+
+    // Yem Yeme Kontrolü
+    if (head.x === snakeFood.x && head.y === snakeFood.y) {
+        snakeScore += 10;
+        document.getElementById('snake-score').textContent = snakeScore;
+
+        if (snakeScore > snakeHighScore) {
+            snakeHighScore = snakeScore;
+            localStorage.setItem('8d_snake_highscore', snakeHighScore);
+            document.getElementById('snake-highscore').textContent = snakeHighScore;
+        }
+        spawnSnakeFood();
+    } else {
+        snake.pop();
+    }
+
+    // ARKA PLAN
+    snakeCtx.fillStyle = '#050b14';
+    snakeCtx.fillRect(0, 0, 320, 320);
+
+    // YEM ÇİZİMİ (Parlak Neon Pembe/Kırmızı Yem)
+    snakeCtx.fillStyle = '#ef4444';
+    snakeCtx.shadowBlur = 10;
+    snakeCtx.shadowColor = '#ef4444';
+    snakeCtx.fillRect(snakeFood.x + 2, snakeFood.y + 2, SNAKE_GRID - 4, SNAKE_GRID - 4);
+
+    // SOLUCAN ÇİZİMİ (Neon Yeşil/Mor Parlaklık)
+    snake.forEach((segment, index) => {
+        snakeCtx.fillStyle = index === 0 ? '#4ade80' : '#22c55e';
+        snakeCtx.shadowBlur = index === 0 ? 12 : 6;
+        snakeCtx.shadowColor = '#22c55e';
+        snakeCtx.fillRect(segment.x + 1, segment.y + 1, SNAKE_GRID - 2, SNAKE_GRID - 2);
+    });
+    snakeCtx.shadowBlur = 0;
+}
+
+function resetSnakeGame() {
+    snake = [{x: 160, y: 160}, {x: 144, y: 160}, {x: 128, y: 160}];
+    snakeDir = 'RIGHT';
+    nextSnakeDir = 'RIGHT';
+    snakeScore = 0;
+    document.getElementById('snake-score').textContent = "0";
+    spawnSnakeFood();
+}
+
+// PC KLAVYEDEN SOLUCAN KONTROLÜ (W-A-S-D ve Ok Tuşları)
+window.addEventListener('keydown', (e) => {
+    const snakeTab = document.getElementById('snake-game');
+    if (snakeTab && snakeTab.classList.contains('active')) {
+        if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') setSnakeDir('UP');
+        if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') setSnakeDir('DOWN');
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') setSnakeDir('LEFT');
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') setSnakeDir('RIGHT');
+    }
+});
